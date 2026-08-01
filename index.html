@@ -91,6 +91,12 @@
                         </select>
                     </div>
 
+                    <!-- BOTÓN CAMBIAR CONTRASEÑA -->
+                    <button onclick="openChangePasswordModal()" title="Cambiar Contraseña" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-key text-amber-400"></i>
+                        <span class="hidden sm:inline">Contraseña</span>
+                    </button>
+
                     <button onclick="logout()" title="Cerrar Sesión" class="bg-rose-950/60 hover:bg-rose-900 text-rose-300 border border-rose-800/80 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
                         <i class="fa-solid fa-right-from-bracket text-rose-400"></i>
                         <span class="hidden sm:inline">Salir</span>
@@ -326,6 +332,39 @@
 
     </main>
 
+    <!-- MODAL CAMBIAR CONTRASEÑA -->
+    <div id="password-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 relative">
+            <h3 class="text-base font-bold text-white mb-1">Cambiar Contraseña</h3>
+            <p id="pwd-user-label" class="text-xs text-blue-400 mb-4 font-semibold"></p>
+
+            <form onsubmit="handlePasswordChange(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Contraseña Actual</label>
+                    <input type="password" id="pwd-current" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Nueva Contraseña</label>
+                    <input type="password" id="pwd-new" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Confirmar Nueva Contraseña</label>
+                    <input type="password" id="pwd-confirm" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div id="pwd-error" class="hidden text-rose-400 text-xs font-semibold bg-rose-950/40 border border-rose-800/60 p-2.5 rounded-lg text-center"></div>
+                <div id="pwd-success" class="hidden text-emerald-400 text-xs font-semibold bg-emerald-950/40 border border-emerald-800/60 p-2.5 rounded-lg text-center">Contraseña actualizada correctamente</div>
+
+                <div class="flex justify-end gap-2 border-t border-slate-800 pt-4">
+                    <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 border border-slate-800 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold transition">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Modal Tarea -->
     <div id="task-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-lg p-6 relative">
@@ -459,7 +498,7 @@
     <!-- Script de Lógica General -->
     <script>
     const TURSO_URL = "https://volskwagen-ingdanielmtz.aws-us-west-2.turso.io";
-    const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU2MjQwMzIsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.ib-dvMI4nDSCmW7xjuJnaJTxxBKG--SMsZWYp89GQ3_a1gHc5EJwR5vd6ZWp7dkgfSAmCkWBsaVaicVvmmddAw";
+    const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU2MjQ1NzgsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.mIqpf2O5gIbxLcKloMp5uUQnP0bBXgHZ06Vp4NFKdsJD6mwoKzuGZZ83AnHksgmmriNv8dz0yc9Y_986LYHHAQ";
 
     let currentRole = 'admin';
     let globalTasks = [];
@@ -519,17 +558,97 @@
                 )`
             ]);
 
-            // Intentar migrar la tabla por si fue creada previamente sin la columna 'author'
             try {
                 await tursoQuery(["ALTER TABLE activity_details ADD COLUMN author TEXT"]);
-            } catch(e) {
-                // Si la columna ya existe, SQLite genera un error implícito que simplemente ignoramos
-            }
+            } catch(e) {}
 
             await loadUsers();
             await loadTasks();
         } catch (err) {
             console.error("Error inicializando tablas en Turso:", err);
+        }
+    }
+
+    /* CAMBIAR CONTRASEÑA PARA EL USUARIO ACTIVO */
+    function openChangePasswordModal() {
+        const session = JSON.parse(localStorage.getItem('tracker_session'));
+        const username = session?.username || (currentRole === 'admin' ? 'Daniel' : 'Usuario');
+        
+        document.getElementById('pwd-user-label').innerText = `Usuario activo: ${username}`;
+        document.getElementById('pwd-current').value = '';
+        document.getElementById('pwd-new').value = '';
+        document.getElementById('pwd-confirm').value = '';
+        document.getElementById('pwd-error').classList.add('hidden');
+        document.getElementById('pwd-success').classList.add('hidden');
+
+        document.getElementById('password-modal').classList.remove('hidden');
+        document.getElementById('password-modal').classList.add('flex');
+    }
+
+    function closeChangePasswordModal() {
+        document.getElementById('password-modal').classList.add('hidden');
+        document.getElementById('password-modal').classList.remove('flex');
+    }
+
+    async function handlePasswordChange(e) {
+        e.preventDefault();
+        const currentPwd = document.getElementById('pwd-current').value.trim();
+        const newPwd = document.getElementById('pwd-new').value.trim();
+        const confirmPwd = document.getElementById('pwd-confirm').value.trim();
+        
+        const errDiv = document.getElementById('pwd-error');
+        const successDiv = document.getElementById('pwd-success');
+        
+        errDiv.classList.add('hidden');
+        successDiv.classList.add('hidden');
+
+        if (newPwd !== confirmPwd) {
+            errDiv.innerText = "La nueva contraseña y su confirmación no coinciden.";
+            errDiv.classList.remove('hidden');
+            return;
+        }
+
+        const session = JSON.parse(localStorage.getItem('tracker_session'));
+        const username = session?.username || (currentRole === 'admin' ? 'Daniel' : 'Usuario');
+
+        try {
+            const res = await tursoQuery([{
+                sql: "SELECT password FROM users WHERE LOWER(username) = LOWER(?)",
+                args: [{ type: "text", value: String(username) }]
+            }]);
+
+            const rows = res[0]?.response?.result?.rows || [];
+
+            if (rows.length === 0) {
+                errDiv.innerText = `No se encontró el registro para el usuario "${username}".`;
+                errDiv.classList.remove('hidden');
+                return;
+            }
+
+            const dbPassword = rows[0][0]?.value || "";
+
+            if (dbPassword && dbPassword !== currentPwd) {
+                errDiv.innerText = "La contraseña actual es incorrecta.";
+                errDiv.classList.remove('hidden');
+                return;
+            }
+
+            await tursoQuery([{
+                sql: "UPDATE users SET password = ? WHERE LOWER(username) = LOWER(?)",
+                args: [
+                    { type: "text", value: String(newPwd) },
+                    { type: "text", value: String(username) }
+                ]
+            }]);
+
+            successDiv.classList.remove('hidden');
+            setTimeout(() => {
+                closeChangePasswordModal();
+            }, 1200);
+
+        } catch (err) {
+            errDiv.innerText = "Error de conexión: " + err.message;
+            errDiv.classList.remove('hidden');
         }
     }
 
@@ -591,7 +710,6 @@
             let attachmentsCount = 0;
 
             rows.forEach(r => {
-                const id = r[0].value;
                 const type = r[1].value;
                 const content = r[2].value;
                 const author = r[3]?.value || 'Anónimo';
@@ -651,9 +769,8 @@
 
         const dateStr = new Date().toLocaleString();
         
-        // Obtener autor activo desde LocalStorage
         const session = JSON.parse(localStorage.getItem('tracker_session'));
-        const authorName = session?.username || (currentRole === 'admin' ? 'Daniel (Admin)' : 'Usuario');
+        const authorName = session?.username || (currentRole === 'admin' ? 'Daniel' : 'Usuario');
 
         try {
             await tursoQuery([{
