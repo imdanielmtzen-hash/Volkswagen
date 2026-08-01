@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracker Pro - Dashboard & WI Plan</title>
+    <title>Tracker Pro - Dashboard & Actividades</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -78,9 +78,6 @@
                 <button onclick="switchTab('activities')" id="nav-actividades" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 transition flex items-center gap-2">
                     <i class="fa-solid fa-list-check text-slate-400"></i> Actividades
                 </button>
-                <button onclick="switchTab('wi-plan')" id="nav-wi-plan" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2 border border-transparent">
-                    <i class="fa-solid fa-file-signature text-amber-400"></i> WI Plan Master
-                </button>
                 <button onclick="switchTab('users')" id="nav-usuarios" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2 border border-transparent">
                     <i class="fa-solid fa-users text-slate-400"></i> Usuarios
                 </button>
@@ -120,7 +117,7 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-auto max-w-5xl mx-auto w-full">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-auto max-w-4xl mx-auto w-full">
             <div onclick="switchTab('activities'); toggleFullScreenMenu();" class="bg-slate-900 hover:bg-slate-800/80 border border-slate-800 hover:border-blue-500/50 p-8 rounded-2xl cursor-pointer transition flex flex-col items-center text-center group shadow-xl">
                 <div class="p-5 bg-blue-600/10 text-blue-400 rounded-2xl mb-4 group-hover:scale-110 transition">
                     <i class="fa-solid fa-list-check text-4xl"></i>
@@ -462,7 +459,7 @@
     <!-- Script de Lógica General -->
     <script>
     const TURSO_URL = "https://volskwagen-ingdanielmtz.aws-us-west-2.turso.io";
-    const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU2MjEzODcsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.WtB8g_ER9EOOBOGvKdulmTB4iZp9nmpW8MFDWZfy9Z3KvXAjEHHxFXqIzRnmIDOhd5nhjsJCWdUUhPSwtAFbDw";
+    const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU2MjQwMzIsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.ib-dvMI4nDSCmW7xjuJnaJTxxBKG--SMsZWYp89GQ3_a1gHc5EJwR5vd6ZWp7dkgfSAmCkWBsaVaicVvmmddAw";
 
     let currentRole = 'admin';
     let globalTasks = [];
@@ -517,9 +514,17 @@
                     activity_id INTEGER,
                     type TEXT,
                     content TEXT,
+                    author TEXT,
                     created_at TEXT
                 )`
             ]);
+
+            // Intentar migrar la tabla por si fue creada previamente sin la columna 'author'
+            try {
+                await tursoQuery(["ALTER TABLE activity_details ADD COLUMN author TEXT"]);
+            } catch(e) {
+                // Si la columna ya existe, SQLite genera un error implícito que simplemente ignoramos
+            }
 
             await loadUsers();
             await loadTasks();
@@ -528,7 +533,7 @@
         }
     }
 
-    /* GESTIÓN DE ADJUNTOS Y COMENTARIOS */
+    /* GESTIÓN DE ADJUNTOS Y COMENTARIOS CON AUTOR */
     async function openDetailsModal(taskId) {
         const task = globalTasks.find(t => t.id === taskId);
         if(!task) return;
@@ -571,7 +576,7 @@
     async function loadDetails(activityId) {
         try {
             const res = await tursoQuery([{
-                sql: "SELECT id, type, content, created_at FROM activity_details WHERE activity_id = ? ORDER BY id DESC",
+                sql: "SELECT id, type, content, author, created_at FROM activity_details WHERE activity_id = ? ORDER BY id DESC",
                 args: [{ type: "integer", value: String(activityId) }]
             }]);
 
@@ -589,32 +594,37 @@
                 const id = r[0].value;
                 const type = r[1].value;
                 const content = r[2].value;
-                const date = r[3].value;
+                const author = r[3]?.value || 'Anónimo';
+                const date = r[4].value;
 
                 if(type === 'comment') {
                     commentsCount++;
                     commentsContainer.innerHTML += `
                         <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs">
-                            <div class="flex justify-between text-[10px] text-slate-500 mb-1">
-                                <span><i class="fa-solid fa-comment text-blue-400 mr-1"></i> Comentario</span>
+                            <div class="flex justify-between items-center text-[10px] text-slate-500 mb-1">
+                                <span class="font-bold text-blue-400 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-user-circle"></i> ${author}
+                                </span>
                                 <span>${date}</span>
                             </div>
-                            <p class="text-slate-200">${content}</p>
+                            <p class="text-slate-200 leading-relaxed">${content}</p>
                         </div>`;
                 } else {
                     attachmentsCount++;
                     attachmentsContainer.innerHTML += `
                         <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs flex justify-between items-center">
                             <div class="truncate mr-2">
-                                <i class="fa-solid fa-link text-amber-400 mr-1.5"></i>
-                                <a href="${content}" target="_blank" class="text-blue-400 hover:underline font-mono">${content}</a>
+                                <div class="text-[10px] text-slate-500 mb-0.5">
+                                    <i class="fa-solid fa-user-circle text-amber-400 mr-1"></i> Subido por: <strong class="text-slate-400">${author}</strong>
+                                </div>
+                                <a href="${content}" target="_blank" class="text-blue-400 hover:underline font-mono truncate block">${content}</a>
                             </div>
-                            <span class="text-[10px] text-slate-500">${date}</span>
+                            <span class="text-[10px] text-slate-500 whitespace-nowrap">${date}</span>
                         </div>`;
                 }
             });
 
-            if(commentsCount === 0) commentsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No hay comentarios aun.</p>`;
+            if(commentsCount === 0) commentsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No hay comentarios aún.</p>`;
             if(attachmentsCount === 0) attachmentsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No hay archivos adjuntos.</p>`;
 
         } catch(e) {
@@ -640,14 +650,19 @@
         }
 
         const dateStr = new Date().toLocaleString();
+        
+        // Obtener autor activo desde LocalStorage
+        const session = JSON.parse(localStorage.getItem('tracker_session'));
+        const authorName = session?.username || (currentRole === 'admin' ? 'Daniel (Admin)' : 'Usuario');
 
         try {
             await tursoQuery([{
-                sql: "INSERT INTO activity_details (activity_id, type, content, created_at) VALUES (?, ?, ?, ?)",
+                sql: "INSERT INTO activity_details (activity_id, type, content, author, created_at) VALUES (?, ?, ?, ?, ?)",
                 args: [
                     { type: "integer", value: String(activityId) },
                     { type: "text", value: type },
                     { type: "text", value: content },
+                    { type: "text", value: authorName },
                     { type: "text", value: dateStr }
                 ]
             }]);
