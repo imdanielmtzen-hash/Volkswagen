@@ -6,6 +6,9 @@
     <title>Tracker Pro - Dashboard & Actividades</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Librerías para exportar a Excel con estilos y gráficos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
         body { background-color: #0f172a; color: #f8fafc; }
@@ -256,6 +259,12 @@
                         <select id="filter-user" onchange="filterTasks()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
                             <option value="">Todos los Responsables</option>
                         </select>
+                        
+                        <!-- BOTÓN DE EXPORTAR A EXCEL -->
+                        <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-md shadow-emerald-600/20">
+                            <i class="fa-solid fa-file-excel"></i> Exportar a Excel
+                        </button>
+
                         <button onclick="openTaskModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-md shadow-blue-600/20">
                             <i class="fa-solid fa-plus"></i> Nueva Actividad
                         </button>
@@ -495,7 +504,7 @@
         </div>
     </div>
 
-    <!-- Script de Lógica General -->
+    <!-- Script de Lógica General y Exportación -->
     <script>
     const TURSO_URL = "https://volskwagen-ingdanielmtz.aws-us-west-2.turso.io";
     const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU2MjQ1NzgsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.mIqpf2O5gIbxLcKloMp5uUQnP0bBXgHZ06Vp4NFKdsJD6mwoKzuGZZ83AnHksgmmriNv8dz0yc9Y_986LYHHAQ";
@@ -510,8 +519,20 @@
     async function tursoQuery(statements) {
         const requests = [{ type: "execute", stmt: { sql: "BEGIN" } }];
         statements.forEach(s => {
-            if (typeof s === 'string') requests.push({ type: "execute", stmt: { sql: s } });
-            else if (typeof s === 'object') requests.push({ type: "execute", stmt: s });
+            if (typeof s === 'string') {
+                requests.push({ type: "execute", stmt: { sql: s } });
+            } else if (typeof s === 'object') {
+                const stmtObj = { sql: s.sql };
+                if (s.args) {
+                    stmtObj.args = s.args.map(arg => {
+                        if (typeof arg === 'object' && arg !== null && 'value' in arg) {
+                            return arg.value;
+                        }
+                        return arg;
+                    });
+                }
+                requests.push({ type: "execute", stmt: stmtObj });
+            }
         });
         requests.push({ type: "execute", stmt: { sql: "COMMIT" } });
 
@@ -569,6 +590,123 @@
         }
     }
 
+    /* FUNCIÓN PARA EXPORTAR A EXCEL IDENTICO */
+    async function exportToExcel() {
+        const workbook = new ExcelJS.Workbook();
+        workbook.creator = 'Tracker Pro';
+        workbook.created = new Date();
+
+        // 1. HOJA DASHBOARD
+        const wsDash = workbook.addWorksheet('Dashboard', { views: [{ showGridLines: true }] });
+
+        // Encabezado principal
+        wsDash.mergeCells('A1:F2');
+        const titleCell = wsDash.getCell('A1');
+        titleCell.value = 'TRACKER PRO - DASHBOARD DE CONTROL';
+        titleCell.font = { name: 'Arial', size: 16, bold: true, color: { argb: 'FFFFFF' } };
+        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1E3A8A' } };
+        titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+        // Tarjetas KPI
+        const metrics = [
+            { label: 'TOTAL ACTIVIDADES', val: document.getElementById('metric-total').innerText, col: 'A', bg: '1E293B', text: '3B82F6' },
+            { label: 'POR VENCER (3 DÍAS)', val: document.getElementById('metric-due-soon').innerText, col: 'C', bg: '1E293B', text: 'F59E0B' },
+            { label: 'COMPLETADAS', val: document.getElementById('metric-completed').innerText, col: 'E', bg: '1E293B', text: '10B981' }
+        ];
+
+        metrics.forEach(m => {
+            wsDash.getCell(`${m.col}4`).value = m.label;
+            wsDash.getCell(`${m.col}4`).font = { size: 9, bold: true, color: { argb: '94A3B8' } };
+            wsDash.getCell(`${m.col}5`).value = parseInt(m.val) || 0;
+            wsDash.getCell(`${m.col}5`).font = { size: 18, bold: true, color: { argb: m.text } };
+            wsDash.getCell(`${m.col}4`).fill = wsDash.getCell(`${m.col}5`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: m.bg } };
+        });
+
+        // Exportar Gráficas como Imagen PNG dentro del Excel
+        if (statusChartInstance) {
+            const statusImgBase64 = statusChartInstance.toBase64Image();
+            const imageId1 = workbook.addImage({ base64: statusImgBase64, extension: 'png' });
+            wsDash.addImage(imageId1, { tl: { col: 0, row: 7 }, ext: { width: 380, height: 240 } });
+        }
+
+        if (barChartInstance) {
+            const barImgBase64 = barChartInstance.toBase64Image();
+            const imageId2 = workbook.addImage({ base64: barImgBase64, extension: 'png' });
+            wsDash.addImage(imageId2, { tl: { col: 3, row: 7 }, ext: { width: 440, height: 240 } });
+        }
+
+        // 2. HOJA DE ACTIVIDADES
+        const wsTasks = workbook.addWorksheet('Actividades');
+
+        const headers = ['ID', 'Título', 'Asignado', 'Prioridad', 'Inicio', 'Fin', 'Avance (%)', 'Estado'];
+        wsTasks.addRow(headers);
+
+        const headerRow = wsTasks.getRow(1);
+        headerRow.height = 24;
+        headerRow.eachCell((cell) => {
+            cell.font = { bold: true, color: { argb: 'FFFFFF' } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1E293B' } };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.border = { bottom: { style: 'medium', color: { argb: '334155' } } };
+        });
+
+        globalTasks.forEach(t => {
+            const row = wsTasks.addRow([
+                t.id,
+                t.title,
+                t.assigned_to,
+                t.priority || 'Media',
+                t.start_date,
+                t.end_date,
+                (t.progress || 0) / 100,
+                t.status
+            ]);
+
+            row.height = 20;
+            row.getCell(1).alignment = { horizontal: 'center' };
+            row.getCell(7).numberFormat = '0%';
+            row.getCell(7).alignment = { horizontal: 'right' };
+
+            const statusCell = row.getCell(8);
+            statusCell.alignment = { horizontal: 'center' };
+
+            if (t.status === 'Completado' || t.status === 'Finalizada') {
+                statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'D1FAE5' } };
+                statusCell.font = { color: { argb: '065F46' }, bold: true };
+            } else if (t.status === 'En Proceso') {
+                statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FEF3C7' } };
+                statusCell.font = { color: { argb: '92400E' }, bold: true };
+            } else {
+                statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE4E6' } };
+                statusCell.font = { color: { argb: '9F1239' }, bold: true };
+            }
+        });
+
+        wsTasks.columns.forEach(column => {
+            let maxLength = 0;
+            column.eachCell({ includeEmpty: true }, cell => {
+                const columnLength = cell.value ? cell.value.toString().length : 10;
+                if (columnLength > maxLength) maxLength = columnLength;
+            });
+            column.width = Math.max(maxLength + 4, 12);
+        });
+
+        // 3. HOJA DE USUARIOS
+        const wsUsers = workbook.addWorksheet('Usuarios');
+        wsUsers.addRow(['ID', 'Username / Responsable']);
+        wsUsers.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' } };
+        wsUsers.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1E293B' } };
+
+        globalUsers.forEach(u => {
+            wsUsers.addRow([u.id, u.username]);
+        });
+        wsUsers.columns = [{ width: 10 }, { width: 30 }];
+
+        // Descarga
+        const buffer = await workbook.xlsx.writeBuffer();
+        saveAs(new Blob([buffer]), `Tracker_Pro_Reporte_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    }
+
     /* CAMBIAR CONTRASEÑA PARA EL USUARIO ACTIVO */
     function openChangePasswordModal() {
         const session = JSON.parse(localStorage.getItem('tracker_session'));
@@ -614,7 +752,7 @@
         try {
             const res = await tursoQuery([{
                 sql: "SELECT password FROM users WHERE LOWER(username) = LOWER(?)",
-                args: [{ type: "text", value: String(username) }]
+                args: [String(username)]
             }]);
 
             const rows = res[0]?.response?.result?.rows || [];
@@ -635,10 +773,7 @@
 
             await tursoQuery([{
                 sql: "UPDATE users SET password = ? WHERE LOWER(username) = LOWER(?)",
-                args: [
-                    { type: "text", value: String(newPwd) },
-                    { type: "text", value: String(username) }
-                ]
+                args: [String(newPwd), String(username)]
             }]);
 
             successDiv.classList.remove('hidden');
@@ -696,7 +831,7 @@
         try {
             const res = await tursoQuery([{
                 sql: "SELECT id, type, content, author, created_at FROM activity_details WHERE activity_id = ? ORDER BY id DESC",
-                args: [{ type: "integer", value: String(activityId) }]
+                args: [Number(activityId)]
             }]);
 
             const rows = res[0]?.response?.result?.rows || [];
@@ -775,13 +910,7 @@
         try {
             await tursoQuery([{
                 sql: "INSERT INTO activity_details (activity_id, type, content, author, created_at) VALUES (?, ?, ?, ?, ?)",
-                args: [
-                    { type: "integer", value: String(activityId) },
-                    { type: "text", value: type },
-                    { type: "text", value: content },
-                    { type: "text", value: authorName },
-                    { type: "text", value: dateStr }
-                ]
+                args: [Number(activityId), String(type), String(content), String(authorName), String(dateStr)]
             }]);
 
             await loadDetails(activityId);
@@ -1048,10 +1177,7 @@
         try {
             await tursoQuery([{
                 sql: "INSERT INTO users (username, password) VALUES (?, ?)",
-                args: [
-                    { type: "text", value: String(username) },
-                    { type: "text", value: String(password) }
-                ]
+                args: [String(username), String(password)]
             }]);
             usernameInput.value = '';
             passwordInput.value = '';
@@ -1069,7 +1195,7 @@
         try {
             await tursoQuery([{
                 sql: "DELETE FROM users WHERE id = ?",
-                args: [{ type: "integer", value: String(id) }]
+                args: [Number(id)]
             }]);
             await loadUsers();
         } catch(e) {
@@ -1133,7 +1259,7 @@
         const assigned = document.getElementById('task-assigned').value;
         const start = document.getElementById('task-start').value;
         const end = document.getElementById('task-end').value;
-        const progress = String(document.getElementById('task-progress').value || "0");
+        const progress = Number(document.getElementById('task-progress').value || 0);
         const status = document.getElementById('task-status').value;
 
         if (!assigned) {
@@ -1145,29 +1271,12 @@
             if (id) {
                 await tursoQuery([{
                     sql: "UPDATE activities SET title = ?, assigned_to = ?, start_date = ?, end_date = ?, progress = ?, status = ?, priority = ? WHERE id = ?",
-                    args: [
-                        { type: "text", value: String(title) },
-                        { type: "text", value: String(assigned) },
-                        { type: "text", value: String(start) },
-                        { type: "text", value: String(end) },
-                        { type: "integer", value: String(progress) },
-                        { type: "text", value: String(status) },
-                        { type: "text", value: String(priority) },
-                        { type: "integer", value: String(id) }
-                    ]
+                    args: [String(title), String(assigned), String(start), String(end), Number(progress), String(status), String(priority), Number(id)]
                 }]);
             } else {
                 await tursoQuery([{
                     sql: "INSERT INTO activities (title, assigned_to, start_date, end_date, progress, status, priority) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    args: [
-                        { type: "text", value: String(title) },
-                        { type: "text", value: String(assigned) },
-                        { type: "text", value: String(start) },
-                        { type: "text", value: String(end) },
-                        { type: "integer", value: String(progress) },
-                        { type: "text", value: String(status) },
-                        { type: "text", value: String(priority) }
-                    ]
+                    args: [String(title), String(assigned), String(start), String(end), Number(progress), String(status), String(priority)]
                 }]);
             }
 
@@ -1183,7 +1292,7 @@
         try {
             await tursoQuery([{
                 sql: "DELETE FROM activities WHERE id = ?",
-                args: [{ type: "integer", value: String(id) }]
+                args: [Number(id)]
             }]);
             await loadTasks();
         } catch (err) {
@@ -1335,17 +1444,18 @@
             }
         });
 
+        // ==========================================
+        // GRÁFICA DE BARRAS APILADA (STACKED BAR CHART)
+        // ==========================================
         const ctxBar = document.getElementById('userBarChart').getContext('2d');
-        const userCounts = {};
         
-        tasksList.forEach(t => {
-            if (t.assigned_to) {
-                userCounts[t.assigned_to] = (userCounts[t.assigned_to] || 0) + 1;
-            }
-        });
+        // 1. Obtener la lista única de responsables
+        const userLabels = Array.from(new Set(tasksList.map(t => t.assigned_to).filter(Boolean)));
 
-        const userLabels = Object.keys(userCounts);
-        const userValues = Object.values(userCounts);
+        // 2. Calcular los datasets para cada estado por usuario
+        const pendingData = userLabels.map(u => tasksList.filter(t => t.assigned_to === u && t.status === 'Pendiente').length);
+        const inProgressData = userLabels.map(u => tasksList.filter(t => t.assigned_to === u && t.status === 'En Proceso').length);
+        const completedData = userLabels.map(u => tasksList.filter(t => (t.status === 'Completado' || t.status === 'Finalizada') && t.assigned_to === u).length);
 
         if (barChartInstance) barChartInstance.destroy();
 
@@ -1353,27 +1463,49 @@
             type: 'bar',
             data: {
                 labels: userLabels.length ? userLabels : ['Sin datos'],
-                datasets: [{
-                    label: 'Actividades',
-                    data: userValues.length ? userValues : [0],
-                    backgroundColor: '#3b82f6',
-                    borderRadius: 6
-                }]
+                datasets: [
+                    {
+                        label: 'Pendiente',
+                        data: userLabels.length ? pendingData : [0],
+                        backgroundColor: '#e11d48', // Rojo
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'En Proceso',
+                        data: userLabels.length ? inProgressData : [0],
+                        backgroundColor: '#f59e0b', // Ámbar
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Completado',
+                        data: userLabels.length ? completedData : [0],
+                        backgroundColor: '#10b981', // Verde
+                        borderRadius: 4
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
                     x: { 
+                        stacked: true, // Habilita apilado en X
                         ticks: { color: '#94a3b8', font: { size: 10 } },
                         grid: { display: false }
                     },
                     y: { 
+                        stacked: true, // Habilita apilado en Y
                         ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 1 },
                         grid: { color: '#1e293b' }
                     }
                 },
-                plugins: { legend: { display: false } }
+                plugins: { 
+                    legend: { 
+                        display: true,
+                        position: 'top',
+                        labels: { color: '#94a3b8', font: { size: 10, weight: '600' } }
+                    } 
+                }
             }
         });
     }
