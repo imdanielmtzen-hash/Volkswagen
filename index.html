@@ -94,7 +94,6 @@
                         </select>
                     </div>
 
-                    <!-- BOTÓN CAMBIAR CONTRASEÑA -->
                     <button onclick="openChangePasswordModal()" title="Cambiar Contraseña" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5">
                         <i class="fa-solid fa-key text-amber-400"></i>
                         <span class="hidden sm:inline">Contraseña</span>
@@ -260,7 +259,6 @@
                             <option value="">Todos los Responsables</option>
                         </select>
                         
-                        <!-- BOTÓN DE EXPORTAR A EXCEL -->
                         <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-md shadow-emerald-600/20">
                             <i class="fa-solid fa-file-excel"></i> Exportar a Excel
                         </button>
@@ -435,9 +433,9 @@
         </div>
     </div>
 
-    <!-- MODAL DE ADJUNTOS Y COMENTARIOS -->
+    <!-- MODAL DE ADJUNTOS Y COMENTARIOS CON PREVISUALIZADOR Y FILE UPLOAD -->
     <div id="details-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl p-6 relative flex flex-col max-h-[90vh]">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl p-6 relative flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
                 <div>
                     <h3 id="details-modal-title" class="text-base font-bold text-white">Detalles de Actividad</h3>
@@ -453,13 +451,13 @@
                     <i class="fa-solid fa-comments"></i> Comentarios
                 </button>
                 <button id="tab-btn-attachments" onclick="switchDetailsTab('attachments')" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
-                    <i class="fa-solid fa-paperclip"></i> Archivos / Enlaces
+                    <i class="fa-solid fa-paperclip"></i> Archivos Adjuntos
                 </button>
             </div>
 
             <!-- Panel Comentarios -->
             <div id="tab-comments" class="space-y-4 flex-1 overflow-y-auto pr-1">
-                <div id="comments-list" class="space-y-3 min-h-[150px] max-h-[250px] overflow-y-auto"></div>
+                <div id="comments-list" class="space-y-3 min-h-[150px] max-h-[300px] overflow-y-auto"></div>
                 <form onsubmit="addDetailItem(event, 'comment')" class="flex gap-2 border-t border-slate-800 pt-3">
                     <input type="text" id="new-comment-text" required placeholder="Escribe un comentario..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition">
@@ -468,17 +466,43 @@
                 </form>
             </div>
 
-            <!-- Panel Adjuntos -->
+            <!-- Panel Adjuntos (Carga local, Vista previa y Descarga) -->
             <div id="tab-attachments" class="space-y-4 flex-1 overflow-y-auto pr-1 hidden">
-                <div id="attachments-list" class="space-y-3 min-h-[150px] max-h-[250px] overflow-y-auto"></div>
-                <form onsubmit="addDetailItem(event, 'attachment')" class="space-y-2 border-t border-slate-800 pt-3">
-                    <input type="url" id="new-attachment-url" required placeholder="https://enlace-o-archivo.com/documento.pdf" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+                <div id="attachments-list" class="space-y-3 min-h-[150px] max-h-[300px] overflow-y-auto"></div>
+                
+                <form onsubmit="addDetailItem(event, 'attachment')" class="space-y-3 border-t border-slate-800 pt-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Cargar Archivo desde PC</label>
+                        <input type="file" id="new-attachment-file" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-amber-500 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-amber-400 hover:file:bg-slate-700 cursor-pointer">
+                    </div>
                     <div class="flex justify-end">
-                        <button type="submit" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-plus"></i> Añadir Adjunto
+                        <button type="submit" id="btn-upload-file" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-upload"></i> Subir a Base de Datos
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PREVISUALIZACIÓN DE ARCHIVOS -->
+    <div id="preview-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center z-[60] p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl h-[85vh] p-6 relative flex flex-col">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+                <div class="truncate mr-4">
+                    <h3 id="preview-filename" class="text-sm font-bold text-white truncate">Previsualizador</h3>
+                    <p class="text-[11px] text-slate-400">Tracker Pro Document Viewer</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a id="preview-download-btn" href="#" download="" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-download"></i> Descargar
+                    </a>
+                    <button onclick="closePreviewModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            
+            <div id="preview-container" class="flex-1 bg-slate-950 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-center p-2 relative">
+                <!-- El contenido se inyecta dinámicamente -->
             </div>
         </div>
     </div>
@@ -504,7 +528,7 @@
         </div>
     </div>
 
-    <!-- Script de Lógica General y Exportación -->
+    <!-- Script de Lógica General -->
     <script>
     const TURSO_URL = "https://volskwagen-ingdanielmtz.aws-us-west-2.turso.io";
     const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU3NzUxNDIsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.mUyLMVSL4erfUbSONunfIk4B4W_sHjlAHjvOb66Rohw8yCjD_Wi3bzSrnRM5CympEoNCIrwqV64V7mvS5qRSCQ";
@@ -512,6 +536,7 @@
     let currentRole = 'admin';
     let globalTasks = [];
     let globalUsers = [];
+    let loadedAttachmentsMap = {};
 
     let statusChartInstance = null;
     let barChartInstance = null;
@@ -585,13 +610,15 @@
                     type TEXT,
                     content TEXT,
                     author TEXT,
-                    created_at TEXT
+                    created_at TEXT,
+                    file_name TEXT,
+                    file_type TEXT
                 )`
             ]);
 
-            try {
-                await tursoQuery(["ALTER TABLE activity_details ADD COLUMN author TEXT"]);
-            } catch(e) {}
+            try { await tursoQuery(["ALTER TABLE activity_details ADD COLUMN author TEXT"]); } catch(e) {}
+            try { await tursoQuery(["ALTER TABLE activity_details ADD COLUMN file_name TEXT"]); } catch(e) {}
+            try { await tursoQuery(["ALTER TABLE activity_details ADD COLUMN file_type TEXT"]); } catch(e) {}
 
             await loadUsers();
             await loadTasks();
@@ -600,16 +627,14 @@
         }
     }
 
-    /* FUNCIÓN PARA EXPORTAR A EXCEL IDENTICO */
+    /* EXPORTAR A EXCEL */
     async function exportToExcel() {
         const workbook = new ExcelJS.Workbook();
         workbook.creator = 'Tracker Pro';
         workbook.created = new Date();
 
-        // 1. HOJA DASHBOARD
         const wsDash = workbook.addWorksheet('Dashboard', { views: [{ showGridLines: true }] });
 
-        // Encabezado principal
         wsDash.mergeCells('A1:F2');
         const titleCell = wsDash.getCell('A1');
         titleCell.value = 'TRACKER PRO - DASHBOARD DE CONTROL';
@@ -617,7 +642,6 @@
         titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1E3A8A' } };
         titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
 
-        // Tarjetas KPI
         const metrics = [
             { label: 'TOTAL ACTIVIDADES', val: document.getElementById('metric-total').innerText, col: 'A', bg: '1E293B', text: '3B82F6' },
             { label: 'POR VENCER (3 DÍAS)', val: document.getElementById('metric-due-soon').innerText, col: 'C', bg: '1E293B', text: 'F59E0B' },
@@ -632,7 +656,6 @@
             wsDash.getCell(`${m.col}4`).fill = wsDash.getCell(`${m.col}5`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: m.bg } };
         });
 
-        // Exportar Gráficas como Imagen PNG dentro del Excel
         if (statusChartInstance) {
             const statusImgBase64 = statusChartInstance.toBase64Image();
             const imageId1 = workbook.addImage({ base64: statusImgBase64, extension: 'png' });
@@ -645,7 +668,6 @@
             wsDash.addImage(imageId2, { tl: { col: 3, row: 7 }, ext: { width: 440, height: 240 } });
         }
 
-        // 2. HOJA DE ACTIVIDADES
         const wsTasks = workbook.addWorksheet('Actividades');
 
         const headers = ['ID', 'Título', 'Asignado', 'Prioridad', 'Inicio', 'Fin', 'Avance (%)', 'Estado'];
@@ -701,7 +723,6 @@
             column.width = Math.max(maxLength + 4, 12);
         });
 
-        // 3. HOJA DE USUARIOS
         const wsUsers = workbook.addWorksheet('Usuarios');
         wsUsers.addRow(['ID', 'Username / Responsable']);
         wsUsers.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' } };
@@ -712,12 +733,11 @@
         });
         wsUsers.columns = [{ width: 10 }, { width: 30 }];
 
-        // Descarga
         const buffer = await workbook.xlsx.writeBuffer();
         saveAs(new Blob([buffer]), `Tracker_Pro_Reporte_${new Date().toISOString().slice(0, 10)}.xlsx`);
     }
 
-    /* CAMBIAR CONTRASEÑA PARA EL USUARIO ACTIVO */
+    /* CAMBIAR CONTRASEÑA */
     function openChangePasswordModal() {
         const session = JSON.parse(localStorage.getItem('tracker_session'));
         const username = session?.username || (currentRole === 'admin' ? 'Daniel' : 'Usuario');
@@ -797,7 +817,7 @@
         }
     }
 
-    /* GESTIÓN DE ADJUNTOS Y COMENTARIOS CON AUTOR */
+    /* GESTIÓN DE ADJUNTOS CON CARGA DESDE PC, PREVISUALIZADOR Y DESCARGA */
     async function openDetailsModal(taskId) {
         const task = globalTasks.find(t => t.id === taskId);
         if(!task) return;
@@ -840,7 +860,7 @@
     async function loadDetails(activityId) {
         try {
             const res = await tursoQuery([{
-                sql: "SELECT id, type, content, author, created_at FROM activity_details WHERE activity_id = ? ORDER BY id DESC",
+                sql: "SELECT id, type, content, author, created_at, file_name, file_type FROM activity_details WHERE activity_id = ? ORDER BY id DESC",
                 args: [Number(activityId)]
             }]);
 
@@ -850,15 +870,19 @@
 
             commentsContainer.innerHTML = '';
             attachmentsContainer.innerHTML = '';
+            loadedAttachmentsMap = {};
 
             let commentsCount = 0;
             let attachmentsCount = 0;
 
             rows.forEach(r => {
+                const detailId = Number(r[0].value);
                 const type = r[1].value;
                 const content = r[2].value;
                 const author = r[3]?.value || 'Anónimo';
                 const date = r[4].value;
+                const fileName = r[5]?.value || 'Archivo Adjunto';
+                const fileType = r[6]?.value || '';
 
                 if(type === 'comment') {
                     commentsCount++;
@@ -874,15 +898,31 @@
                         </div>`;
                 } else {
                     attachmentsCount++;
+                    loadedAttachmentsMap[detailId] = {
+                        id: detailId,
+                        fileName: fileName,
+                        fileType: fileType,
+                        dataUrl: content
+                    };
+
                     attachmentsContainer.innerHTML += `
-                        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs flex justify-between items-center">
-                            <div class="truncate mr-2">
+                        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs flex justify-between items-center gap-3">
+                            <div class="truncate flex-1">
                                 <div class="text-[10px] text-slate-500 mb-0.5">
-                                    <i class="fa-solid fa-user-circle text-amber-400 mr-1"></i> Subido por: <strong class="text-slate-400">${author}</strong>
+                                    <i class="fa-solid fa-user-circle text-amber-400 mr-1"></i> Subido por: <strong class="text-slate-400">${author}</strong> • <span class="text-slate-600">${date}</span>
                                 </div>
-                                <a href="${content}" target="_blank" class="text-blue-400 hover:underline font-mono truncate block">${content}</a>
+                                <div class="font-semibold text-slate-200 truncate flex items-center gap-2">
+                                    <i class="fa-solid fa-file-lines text-amber-500"></i> ${fileName}
+                                </div>
                             </div>
-                            <span class="text-[10px] text-slate-500 whitespace-nowrap">${date}</span>
+                            <div class="flex items-center gap-2">
+                                <button onclick="openPreviewModal(${detailId})" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 px-2.5 py-1.5 rounded-lg transition font-bold text-[11px] flex items-center gap-1">
+                                    <i class="fa-solid fa-eye"></i> Ver
+                                </button>
+                                <a href="${content}" download="${fileName}" class="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-lg transition font-bold text-[11px] flex items-center gap-1">
+                                    <i class="fa-solid fa-download"></i> Descargar
+                                </a>
+                            </div>
                         </div>`;
                 }
             });
@@ -895,37 +935,107 @@
         }
     }
 
+    /* PREVISUALIZACIÓN DE ARCHIVOS */
+    function openPreviewModal(detailId) {
+        const item = loadedAttachmentsMap[detailId];
+        if (!item) return;
+
+        document.getElementById('preview-filename').innerText = item.fileName;
+        const dlBtn = document.getElementById('preview-download-btn');
+        dlBtn.href = item.dataUrl;
+        dlBtn.download = item.fileName;
+
+        const container = document.getElementById('preview-container');
+        container.innerHTML = '';
+
+        if (item.fileType.startsWith('image/')) {
+            container.innerHTML = `<img src="${item.dataUrl}" class="max-h-full max-w-full object-contain rounded-lg shadow-lg">`;
+        } else if (item.fileType === 'application/pdf') {
+            container.innerHTML = `<iframe src="${item.dataUrl}" class="w-full h-full border-0 rounded-lg"></iframe>`;
+        } else {
+            container.innerHTML = `
+                <div class="text-center p-8 max-w-sm">
+                    <i class="fa-solid fa-file-lines text-6xl text-slate-600 mb-4"></i>
+                    <p class="text-xs text-slate-400 mb-4">La previsualización en vivo no está disponible para este tipo de archivo (<strong>${item.fileType || 'Desconocido'}</strong>).</p>
+                    <a href="${item.dataUrl}" download="${item.fileName}" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition inline-flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i> Descargar Archivo Directamente
+                    </a>
+                </div>
+            `;
+        }
+
+        document.getElementById('preview-modal').classList.remove('hidden');
+        document.getElementById('preview-modal').classList.add('flex');
+    }
+
+    function closePreviewModal() {
+        document.getElementById('preview-modal').classList.add('hidden');
+        document.getElementById('preview-modal').classList.remove('flex');
+        document.getElementById('preview-container').innerHTML = '';
+    }
+
     async function addDetailItem(e, type) {
         e.preventDefault();
         const activityId = document.getElementById('details-activity-id').value;
-        let content = "";
-
-        if(type === 'comment') {
-            const input = document.getElementById('new-comment-text');
-            content = input.value.trim();
-            if(!content) return;
-            input.value = '';
-        } else {
-            const input = document.getElementById('new-attachment-url');
-            content = input.value.trim();
-            if(!content) return;
-            input.value = '';
-        }
-
         const dateStr = new Date().toLocaleString();
-        
         const session = JSON.parse(localStorage.getItem('tracker_session'));
         const authorName = session?.username || (currentRole === 'admin' ? 'Daniel' : 'Usuario');
 
-        try {
-            await tursoQuery([{
-                sql: "INSERT INTO activity_details (activity_id, type, content, author, created_at) VALUES (?, ?, ?, ?, ?)",
-                args: [Number(activityId), String(type), String(content), String(authorName), String(dateStr)]
-            }]);
+        if(type === 'comment') {
+            const input = document.getElementById('new-comment-text');
+            const content = input.value.trim();
+            if(!content) return;
 
-            await loadDetails(activityId);
-        } catch(err) {
-            alert("Error al guardar: " + err.message);
+            try {
+                await tursoQuery([{
+                    sql: "INSERT INTO activity_details (activity_id, type, content, author, created_at) VALUES (?, ?, ?, ?, ?)",
+                    args: [Number(activityId), 'comment', String(content), String(authorName), String(dateStr)]
+                }]);
+                input.value = '';
+                await loadDetails(activityId);
+            } catch(err) {
+                alert("Error al guardar comentario: " + err.message);
+            }
+        } else {
+            const fileInput = document.getElementById('new-attachment-file');
+            const file = fileInput.files[0];
+
+            if(!file) {
+                alert("Por favor selecciona un archivo desde tu computadora.");
+                return;
+            }
+
+            // Validación de tamaño (Máximo ~3MB recomendado para SQLite/Turso en Base64)
+            if (file.size > 3 * 1024 * 1024) {
+                alert("El archivo excede el límite permitido para carga directa (Máximo 3 MB).");
+                return;
+            }
+
+            const btnUpload = document.getElementById('btn-upload-file');
+            btnUpload.disabled = true;
+            btnUpload.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                const base64Data = event.target.result;
+
+                try {
+                    await tursoQuery([{
+                        sql: "INSERT INTO activity_details (activity_id, type, content, author, created_at, file_name, file_type) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        args: [Number(activityId), 'attachment', String(base64Data), String(authorName), String(dateStr), String(file.name), String(file.type)]
+                    }]);
+
+                    fileInput.value = '';
+                    await loadDetails(activityId);
+                } catch(err) {
+                    alert("Error al guardar el archivo en la BD: " + err.message);
+                } finally {
+                    btnUpload.disabled = false;
+                    btnUpload.innerHTML = `<i class="fa-solid fa-upload"></i> Subir a Base de Datos`;
+                }
+            };
+
+            reader.readAsDataURL(file);
         }
     }
 
@@ -1007,7 +1117,7 @@
                         </span>
                     </td>
                     <td class="p-3.5 text-center">
-                        <button onclick="openDetailsModal(${t.id})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-lg transition text-[11px] flex items-center gap-1.5 mx-auto">
+                        <button onclick="openDetailsModal(${t.id})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-lg transition text-[11px] flex items-center gap-1.5 mx-auto font-semibold">
                             <i class="fa-solid fa-folder-open text-amber-400"></i> Ver
                         </button>
                     </td>
