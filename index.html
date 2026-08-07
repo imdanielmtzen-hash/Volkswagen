@@ -6,6 +6,8 @@
     <title>Tracker Pro - Dashboard & Actividades</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plugin para mostrar labels de cantidades y porcentajes dentro de las gráficas -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <!-- Librerías para exportar a Excel con estilos y gráficos -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -530,6 +532,11 @@
 
     <!-- Script de Lógica General -->
     <script>
+    // Registro global del plugin de Chart.js para DataLabels
+    if (typeof ChartDataLabels !== 'undefined') {
+        Chart.register(ChartDataLabels);
+    }
+
     const TURSO_URL = "https://volskwagen-ingdanielmtz.aws-us-west-2.turso.io";
     const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU3NzUxNDIsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.mUyLMVSL4erfUbSONunfIk4B4W_sHjlAHjvOb66Rohw8yCjD_Wi3bzSrnRM5CympEoNCIrwqV64V7mvS5qRSCQ";
 
@@ -1005,7 +1012,6 @@
                 return;
             }
 
-            // Validación de tamaño (Máximo ~3MB recomendado para SQLite/Turso en Base64)
             if (file.size > 3 * 1024 * 1024) {
                 alert("El archivo excede el límite permitido para carga directa (Máximo 3 MB).");
                 return;
@@ -1540,6 +1546,7 @@
 
         if (statusChartInstance) statusChartInstance.destroy();
 
+        // Configuración de la Gráfica de Estado (Pie / Doughnut Chart) con Porcentajes
         statusChartInstance = new Chart(ctxDoughnut, {
             type: 'doughnut',
             data: {
@@ -1558,6 +1565,21 @@
                     legend: {
                         position: 'top',
                         labels: { color: '#94a3b8', font: { size: 11, weight: '600' } }
+                    },
+                    // Muestra el PORCENTAJE en letras BLANCAS dentro del Pie Chart
+                    datalabels: {
+                        color: '#ffffff',
+                        font: {
+                            weight: 'bold',
+                            size: 12
+                        },
+                        formatter: (value, ctx) => {
+                            const dataset = ctx.chart.data.datasets[0];
+                            const total = dataset.data.reduce((acc, curr) => acc + curr, 0);
+                            if (total === 0 || value === 0) return '';
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${percentage % 1 === 0 ? Math.round(percentage) : percentage}%`;
+                        }
                     }
                 },
                 cutout: '70%'
@@ -1574,6 +1596,7 @@
 
         if (barChartInstance) barChartInstance.destroy();
 
+        // Configuración de la Gráfica de Barras con CANTIDADES por estado en letras BLANCAS
         barChartInstance = new Chart(ctxBar, {
             type: 'bar',
             data: {
@@ -1619,7 +1642,18 @@
                         display: true,
                         position: 'top',
                         labels: { color: '#94a3b8', font: { size: 10, weight: '600' } }
-                    } 
+                    },
+                    // Muestra la CANTIDAD EXACTA en letras BLANCAS dentro de las barras
+                    datalabels: {
+                        color: '#ffffff',
+                        font: {
+                            weight: 'bold',
+                            size: 11
+                        },
+                        formatter: (value) => {
+                            return value > 0 ? value : ''; // Si la cantidad es 0, no dibuja el texto
+                        }
+                    }
                 }
             }
         });
