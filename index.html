@@ -6,9 +6,7 @@
     <title>Tracker Pro - Dashboard & Actividades</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Plugin para mostrar labels de cantidades y porcentajes dentro de las gráficas -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-    <!-- Librerías para exportar a Excel con estilos y gráficos -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -89,8 +87,8 @@
                 
                 <div class="flex items-center gap-2 ml-2 pl-2 border-l border-slate-800">
                     <div class="bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs flex items-center gap-2">
-                        <i class="fa-solid fa-user-gear text-indigo-400"></i>
-                        <select id="role-selector" onchange="toggleRole(this.value)" class="bg-transparent text-slate-200 text-xs font-medium focus:outline-none cursor-pointer">
+                        <i class="fa-solid fa-user-gear text-indigo-400 pointer-events-none"></i>
+                        <select id="role-selector" onchange="toggleRole(this.value)" class="bg-transparent text-slate-200 text-xs font-medium focus:outline-none cursor-pointer pr-1">
                             <option value="admin" class="bg-slate-900" selected>Admin: Daniel</option>
                             <option value="user" class="bg-slate-900">Usuario Standard</option>
                         </select>
@@ -279,16 +277,15 @@
                     <table class="w-full text-left text-xs border-collapse">
                         <thead>
                             <tr class="bg-slate-950/60 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
-                                <th class="p-3.5">ID</th>
-                                <th class="p-3.5">Título</th>
-                                <th class="p-3.5">Estación</th>
-                                <th class="p-3.5">Asignado</th>
-                                <th class="p-3.5">Prioridad</th>
-                                <th class="p-3.5">Inicio</th>
-                                <th class="p-3.5">Fin</th>
-                                <th class="p-3.5">Avance</th>
-                                <th class="p-3.5">Estado</th>
-                                <th class="p-3.5 text-center">Adjuntos / Comentarios</th>
+                                <th class="p-3.5">#</th>
+                                <th class="p-3.5">Problem Identified</th>
+                                <th class="p-3.5">Process</th>
+                                <th class="p-3.5">Owner (Name)</th>
+                                <th class="p-3.5">Action Taken</th>
+                                <th class="p-3.5">Evidence</th>
+                                <th class="p-3.5">Due Date</th>
+                                <th class="p-3.5">Date of Implementation</th>
+                                <th class="p-3.5">Status</th>
                                 <th class="p-3.5 text-right">Acciones</th>
                             </tr>
                         </thead>
@@ -423,18 +420,23 @@
                 <input type="hidden" id="task-id">
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Título</label>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Problem Identified (Título)</label>
                     <input type="text" id="task-title" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Estación</label>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Action Taken</label>
+                    <textarea id="task-action-taken" rows="2" placeholder="Describe las acciones realizadas..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Process (Estación)</label>
                     <select id="task-station" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></select>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Responsable</label>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Owner (Name)</label>
                         <select id="task-assigned" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></select>
                     </div>
                     <div>
@@ -449,11 +451,11 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Fecha Inicio</label>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Due Date</label>
                         <input type="date" id="task-start" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Fecha Fin</label>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Date of Implementation</label>
                         <input type="date" id="task-end" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
                     </div>
                 </div>
@@ -464,11 +466,11 @@
                         <input type="number" id="task-progress" min="0" max="100" value="0" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Estado</label>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Status</label>
                         <select id="task-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-                            <option value="Pendiente">Pendiente</option>
-                            <option value="En Proceso">En Proceso</option>
-                            <option value="Completado">Completado</option>
+                            <option value="Open">Open</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Closed">Closed</option>
                         </select>
                     </div>
                 </div>
@@ -481,7 +483,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE ADJUNTOS Y COMENTARIOS CON PREVISUALIZADOR Y FILE UPLOAD -->
+    <!-- MODAL DE ADJUNTOS Y COMENTARIOS -->
     <div id="details-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl p-6 relative flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -495,16 +497,15 @@
             <input type="hidden" id="details-activity-id">
 
             <div class="flex gap-4 border-b border-slate-800 mb-4 text-xs font-bold">
-                <button id="tab-btn-comments" onclick="switchDetailsTab('comments')" class="pb-2 border-b-2 border-blue-500 text-blue-400 flex items-center gap-2">
-                    <i class="fa-solid fa-comments"></i> Comentarios
+                <button id="tab-btn-attachments" onclick="switchDetailsTab('attachments')" class="pb-2 border-b-2 border-blue-500 text-blue-400 flex items-center gap-2">
+                    <i class="fa-solid fa-paperclip"></i> Archivos Evidence
                 </button>
-                <button id="tab-btn-attachments" onclick="switchDetailsTab('attachments')" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
-                    <i class="fa-solid fa-paperclip"></i> Archivos Adjuntos
+                <button id="tab-btn-comments" onclick="switchDetailsTab('comments')" class="pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-comments"></i> Comentarios
                 </button>
             </div>
 
-            <!-- Panel Comentarios -->
-            <div id="tab-comments" class="space-y-4 flex-1 overflow-y-auto pr-1">
+            <div id="tab-comments" class="space-y-4 flex-1 overflow-y-auto pr-1 hidden">
                 <div id="comments-list" class="space-y-3 min-h-[150px] max-h-[300px] overflow-y-auto"></div>
                 <form onsubmit="addDetailItem(event, 'comment')" class="flex gap-2 border-t border-slate-800 pt-3">
                     <input type="text" id="new-comment-text" required placeholder="Escribe un comentario..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
@@ -514,18 +515,17 @@
                 </form>
             </div>
 
-            <!-- Panel Adjuntos (Carga local, Vista previa y Descarga) -->
-            <div id="tab-attachments" class="space-y-4 flex-1 overflow-y-auto pr-1 hidden">
+            <div id="tab-attachments" class="space-y-4 flex-1 overflow-y-auto pr-1">
                 <div id="attachments-list" class="space-y-3 min-h-[150px] max-h-[300px] overflow-y-auto"></div>
                 
                 <form onsubmit="addDetailItem(event, 'attachment')" class="space-y-3 border-t border-slate-800 pt-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Cargar Archivo desde PC</label>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Cargar Archivo Evidence desde PC</label>
                         <input type="file" id="new-attachment-file" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-amber-500 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-amber-400 hover:file:bg-slate-700 cursor-pointer">
                     </div>
                     <div class="flex justify-end">
                         <button type="submit" id="btn-upload-file" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-upload"></i> Subir a Base de Datos
+                            <i class="fa-solid fa-upload"></i> Subir Evidence a Base de Datos
                         </button>
                     </div>
                 </form>
@@ -533,7 +533,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE PREVISUALIZACIÓN DE ARCHIVOS -->
+    <!-- MODAL PREVISUALIZACIÓN -->
     <div id="preview-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center z-[60] p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl h-[85vh] p-6 relative flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -549,9 +549,7 @@
                 </div>
             </div>
             
-            <div id="preview-container" class="flex-1 bg-slate-950 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-center p-2 relative">
-                <!-- El contenido se inyecta dinámicamente -->
-            </div>
+            <div id="preview-container" class="flex-1 bg-slate-950 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-center p-2 relative"></div>
         </div>
     </div>
 
@@ -576,37 +574,31 @@
         </div>
     </div>
 
-    <!-- Script de Lógica General -->
+    <!-- Script con Adaptador JSONP para Localhost/File sin CORS error -->
     <script>
-    // Registro global del plugin de Chart.js para DataLabels
     if (typeof ChartDataLabels !== 'undefined') {
         Chart.register(ChartDataLabels);
     }
 
     const TURSO_URL = "https://volskwagen-ingdanielmtz.aws-us-west-2.turso.io";
-    const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODU3NzUxNDIsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.mUyLMVSL4erfUbSONunfIk4B4W_sHjlAHjvOb66Rohw8yCjD_Wi3bzSrnRM5CympEoNCIrwqV64V7mvS5qRSCQ";
+    const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODg1NDU2NDQsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.gcakKk4LSHEkWuCFP4rpHSpBYtJcc7IiATImmPXyH7rDXWN1iyBOzmJHnPKIWetNv8LbQyJnhysZCOiUVchHDQ";
 
     let currentRole = 'admin';
     let globalTasks = [];
     let globalUsers = [];
     let globalStations = [];
     let loadedAttachmentsMap = {};
+    let globalEvidencesMap = {};
 
     let statusChartInstance = null;
     let barChartInstance = null;
 
     function formatTursoArg(arg) {
-        if (arg === null || arg === undefined) {
-            return { type: "null" };
-        }
+        if (arg === null || arg === undefined) return { type: "null" };
         if (typeof arg === "number") {
-            return Number.isInteger(arg) 
-                ? { type: "integer", value: String(arg) } 
-                : { type: "float", value: arg };
+            return Number.isInteger(arg) ? { type: "integer", value: String(arg) } : { type: "float", value: arg };
         }
-        if (typeof arg === "object" && arg.type && "value" in arg) {
-            return arg;
-        }
+        if (typeof arg === "object" && arg.type && "value" in arg) return arg;
         return { type: "text", value: String(arg) };
     }
 
@@ -617,37 +609,59 @@
                 requests.push({ type: "execute", stmt: { sql: s } });
             } else if (typeof s === 'object') {
                 const stmtObj = { sql: s.sql };
-                if (s.args) {
-                    stmtObj.args = s.args.map(formatTursoArg);
-                }
+                if (s.args) stmtObj.args = s.args.map(formatTursoArg);
                 requests.push({ type: "execute", stmt: stmtObj });
             }
         });
         requests.push({ type: "execute", stmt: { sql: "COMMIT" } });
 
-        const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${TURSO_TOKEN}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ requests })
-        });
+        try {
+            const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${TURSO_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ requests })
+            });
 
-        if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${errText}`);
-        }
-
-        const data = await response.json();
-
-        data.results.forEach(res => {
-            if (res.type === "error") {
-                throw new Error(res.error?.message || "Error al ejecutar consulta SQL en Turso");
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`HTTP ${response.status}: ${errText}`);
             }
-        });
 
-        return data.results.slice(1, -1);
+            const data = await response.json();
+            data.results.forEach(res => {
+                if (res.type === "error") {
+                    throw new Error(res.error?.message || "Error al ejecutar consulta SQL en Turso");
+                }
+            });
+
+            return data.results.slice(1, -1);
+        } catch (fetchErr) {
+            return new Promise((resolve, reject) => {
+                const callbackName = 'turso_cb_' + Math.random().toString(36).substr(2, 9);
+                window[callbackName] = function(data) {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    if (data && data.results) {
+                        resolve(data.results.slice(1, -1));
+                    } else {
+                        reject(new Error("Error procesando respuesta JSONP local."));
+                    }
+                };
+
+                const script = document.createElement('script');
+                const reqParam = encodeURIComponent(JSON.stringify({ requests }));
+                script.src = `${TURSO_URL}/v2/pipeline?authToken=${TURSO_TOKEN}&callback=${callbackName}&json=${reqParam}`;
+                script.onerror = () => {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    reject(new Error("Error en script dinámico. Verifique conectividad a internet."));
+                };
+                document.body.appendChild(script);
+            });
+        }
     }
 
     window.onload = function() {
@@ -658,13 +672,25 @@
     async function initDB() {
         try {
             await tursoQuery([
+                `CREATE TABLE IF NOT EXISTS activities (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT,
+                    assigned_to TEXT,
+                    start_date TEXT,
+                    end_date TEXT,
+                    progress INTEGER,
+                    status TEXT,
+                    priority TEXT,
+                    station TEXT,
+                    action_taken TEXT
+                )`,
                 `CREATE TABLE IF NOT EXISTS activity_details (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     activity_id INTEGER,
                     type TEXT,
                     content TEXT,
-                    author TEXT,
                     created_at TEXT,
+                    author TEXT,
                     file_name TEXT,
                     file_type TEXT
                 )`,
@@ -678,6 +704,7 @@
             try { await tursoQuery(["ALTER TABLE activity_details ADD COLUMN file_name TEXT"]); } catch(e) {}
             try { await tursoQuery(["ALTER TABLE activity_details ADD COLUMN file_type TEXT"]); } catch(e) {}
             try { await tursoQuery(["ALTER TABLE activities ADD COLUMN station TEXT"]); } catch(e) {}
+            try { await tursoQuery(["ALTER TABLE activities ADD COLUMN action_taken TEXT"]); } catch(e) {}
 
             await loadUsers();
             await loadStations();
@@ -687,7 +714,6 @@
         }
     }
 
-    /* GESTIÓN DE ESTACIONES */
     async function loadStations() {
         try {
             const res = await tursoQuery(["SELECT id, name FROM stations ORDER BY name ASC"]);
@@ -700,7 +726,7 @@
 
             const taskStationSelect = document.getElementById('task-station');
             if (taskStationSelect) {
-                taskStationSelect.innerHTML = '<option value="">Selecciona Estación...</option>';
+                taskStationSelect.innerHTML = '<option value="">Selecciona Process (Estación)...</option>';
                 globalStations.forEach(st => {
                     taskStationSelect.innerHTML += `<option value="${st.name}">${st.name}</option>`;
                 });
@@ -735,7 +761,7 @@
         }
 
         globalStations.forEach(st => {
-            tbody.innerHTML = tbody.innerHTML + `
+            tbody.innerHTML += `
                 <tr class="hover:bg-slate-800/40 border-b border-slate-800/60">
                     <td class="p-3 font-mono text-slate-500">#${st.id}</td>
                     <td class="p-3 font-semibold text-white">${st.name}</td>
@@ -761,7 +787,7 @@
             input.value = '';
             await loadStations();
         } catch (err) {
-            alert("Error al guardar estación (puede que ya exista): " + err.message);
+            alert("Error al guardar estación: " + err.message);
         }
     }
 
@@ -778,7 +804,6 @@
         }
     }
 
-    /* EXPORTAR A EXCEL */
     async function exportToExcel() {
         const workbook = new ExcelJS.Workbook();
         workbook.creator = 'Tracker Pro';
@@ -788,9 +813,9 @@
 
         wsDash.mergeCells('A1:F2');
         const titleCell = wsDash.getCell('A1');
-        titleCell.value = 'TRACKER PRO - DASHBOARD DE CONTROL';
-        titleCell.font = { name: 'Arial', size: 16, bold: true, color: { argb: 'FFFFFF' } };
-        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1E3A8A' } };
+        titleCell.value = 'RIVIAN | VOLKSWAGEN GROUP TECHNOLOGIES - EVT 2 VFF GEMBA';
+        titleCell.font = { name: 'Arial', size: 14, bold: true, color: { argb: '000000' } };
+        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'EFEFEF' } };
         titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
 
         const metrics = [
@@ -819,64 +844,99 @@
             wsDash.addImage(imageId2, { tl: { col: 3, row: 7 }, ext: { width: 440, height: 240 } });
         }
 
-        const wsTasks = workbook.addWorksheet('Actividades');
+        const wsTasks = workbook.addWorksheet('EVT 2 VFF GEMBA', { views: [{ showGridLines: true }] });
 
-        const headers = ['ID', 'Título', 'Estación', 'Asignado', 'Prioridad', 'Inicio', 'Fin', 'Avance (%)', 'Estado'];
-        wsTasks.addRow(headers);
+        wsTasks.mergeCells('A1:C2');
+        const headerTitle1 = wsTasks.getCell('A1');
+        headerTitle1.value = "RIVIAN | VOLKSWAGEN GROUP\nT E C H N O L O G I E S";
+        headerTitle1.font = { name: 'Arial', size: 10, bold: true };
+        headerTitle1.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
 
-        const headerRow = wsTasks.getRow(1);
-        headerRow.height = 24;
+        wsTasks.mergeCells('D1:I2');
+        const headerTitle2 = wsTasks.getCell('D1');
+        headerTitle2.value = "EVT 2 VFF GEMBA";
+        headerTitle2.font = { name: 'Arial', size: 14, bold: true };
+        headerTitle2.alignment = { horizontal: 'center', vertical: 'middle' };
+
+        const headers = ['#', 'Problem Identified', 'Process', 'Owner (Name)', 'Action Taken', 'Evidence', 'Due Date', 'Date of Implementation', 'Status'];
+        
+        wsTasks.getRow(4).values = headers;
+        const headerRow = wsTasks.getRow(4);
+        headerRow.height = 28;
+
         headerRow.eachCell((cell) => {
-            cell.font = { bold: true, color: { argb: 'FFFFFF' } };
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1E293B' } };
-            cell.alignment = { horizontal: 'center', vertical: 'middle' };
-            cell.border = { bottom: { style: 'medium', color: { argb: '334155' } } };
+            cell.font = { name: 'Arial', size: 10, bold: true, color: { argb: '103B36' } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '99C2BC' } };
+            cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            cell.border = { 
+                top: { style: 'thin', color: { argb: '7BA49F' } },
+                left: { style: 'thin', color: { argb: '7BA49F' } },
+                bottom: { style: 'thin', color: { argb: '7BA49F' } },
+                right: { style: 'thin', color: { argb: '7BA49F' } }
+            };
         });
 
-        globalTasks.forEach(t => {
+        globalTasks.forEach((t, idx) => {
+            const evidenceItems = globalEvidencesMap[t.id] || [];
+
             const row = wsTasks.addRow([
-                t.id,
+                idx + 1,
                 t.title,
                 t.station || 'N/A',
                 t.assigned_to,
-                t.priority || 'Media',
+                t.action_taken || '',
+                evidenceItems.length > 0 ? evidenceItems[0].fileName : 'Sin archivos',
                 t.start_date,
                 t.end_date,
-                (t.progress || 0) / 100,
-                t.status
+                t.status || 'Open'
             ]);
 
-            row.height = 20;
-            row.getCell(1).alignment = { horizontal: 'center' };
-            row.getCell(8).numberFormat = '0%';
-            row.getCell(8).alignment = { horizontal: 'right' };
+            row.height = 24;
 
-            const statusCell = row.getCell(9);
-            statusCell.alignment = { horizontal: 'center' };
+            row.eachCell((cell) => {
+                cell.font = { name: 'Arial', size: 9 };
+                cell.alignment = { vertical: 'middle', wrapText: true };
+                cell.border = {
+                    top: { style: 'thin', color: { argb: 'E0E0E0' } },
+                    left: { style: 'thin', color: { argb: 'E0E0E0' } },
+                    bottom: { style: 'thin', color: { argb: 'E0E0E0' } },
+                    right: { style: 'thin', color: { argb: 'E0E0E0' } }
+                };
+            });
 
-            if (t.status === 'Completado' || t.status === 'Finalizada') {
-                statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'D1FAE5' } };
-                statusCell.font = { color: { argb: '065F46' }, bold: true };
-            } else if (t.status === 'En Proceso') {
-                statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FEF3C7' } };
-                statusCell.font = { color: { argb: '92400E' }, bold: true };
+            row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+            row.getCell(3).alignment = { horizontal: 'center', vertical: 'middle' };
+            row.getCell(4).alignment = { horizontal: 'center', vertical: 'middle' };
+            row.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
+            row.getCell(8).alignment = { horizontal: 'center', vertical: 'middle' };
+            row.getCell(9).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            const evidenceCell = row.getCell(6);
+            if (evidenceItems.length > 0) {
+                const firstEv = evidenceItems[0];
+                if (firstEv.dataUrl && firstEv.dataUrl.startsWith('data:')) {
+                    evidenceCell.value = {
+                        text: firstEv.fileName,
+                        hyperlink: firstEv.dataUrl,
+                        tooltip: 'Clic para descargar archivo'
+                    };
+                    evidenceCell.font = { name: 'Arial', size: 9, color: { argb: '0550AE' }, underline: true };
+                } else {
+                    evidenceCell.value = firstEv.fileName;
+                }
             } else {
-                statusCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE4E6' } };
-                statusCell.font = { color: { argb: '9F1239' }, bold: true };
+                evidenceCell.value = 'Sin adjuntos';
+                evidenceCell.font = { name: 'Arial', size: 9, color: { argb: '999999' } };
             }
         });
 
-        wsTasks.columns.forEach(column => {
-            let maxLength = 0;
-            column.eachCell({ includeEmpty: true }, cell => {
-                const columnLength = cell.value ? cell.value.toString().length : 10;
-                if (columnLength > maxLength) maxLength = columnLength;
-            });
-            column.width = Math.max(maxLength + 4, 12);
+        const colWidths = [6, 45, 18, 22, 35, 25, 14, 16, 12];
+        colWidths.forEach((w, i) => {
+            wsTasks.getColumn(i + 1).width = w;
         });
 
         const wsUsers = workbook.addWorksheet('Usuarios');
-        wsUsers.addRow(['ID', 'Username / Responsable']);
+        wsUsers.addRow(['ID', 'Username / Owner']);
         wsUsers.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' } };
         wsUsers.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1E293B' } };
 
@@ -886,10 +946,9 @@
         wsUsers.columns = [{ width: 10 }, { width: 30 }];
 
         const buffer = await workbook.xlsx.writeBuffer();
-        saveAs(new Blob([buffer]), `Tracker_Pro_Reporte_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        saveAs(new Blob([buffer]), `GEMBA_EVT2_Report_${new Date().toISOString().slice(0, 10)}.xlsx`);
     }
 
-    /* CAMBIAR CONTRASEÑA */
     function openChangePasswordModal() {
         const session = JSON.parse(localStorage.getItem('tracker_session'));
         const username = session?.username || (currentRole === 'admin' ? 'Daniel' : 'Usuario');
@@ -923,7 +982,7 @@
         successDiv.classList.add('hidden');
 
         if (newPwd !== confirmPwd) {
-            errDiv.innerText = "La nueva contraseña y su confirmación no coinciden.";
+            errDiv.innerText = "La nueva contraseña no coincide.";
             errDiv.classList.remove('hidden');
             return;
         }
@@ -940,7 +999,7 @@
             const rows = res[0]?.response?.result?.rows || [];
 
             if (rows.length === 0) {
-                errDiv.innerText = `No se encontró el registro para el usuario "${username}".`;
+                errDiv.innerText = `Usuario "${username}" no encontrado.`;
                 errDiv.classList.remove('hidden');
                 return;
             }
@@ -948,7 +1007,7 @@
             const dbPassword = rows[0][0]?.value || "";
 
             if (dbPassword && dbPassword !== currentPwd) {
-                errDiv.innerText = "La contraseña actual es incorrecta.";
+                errDiv.innerText = "Contraseña actual incorrecta.";
                 errDiv.classList.remove('hidden');
                 return;
             }
@@ -964,24 +1023,23 @@
             }, 1200);
 
         } catch (err) {
-            errDiv.innerText = "Error de conexión: " + err.message;
+            errDiv.innerText = "Error: " + err.message;
             errDiv.classList.remove('hidden');
         }
     }
 
-    /* GESTIÓN DE ADJUNTOS CON CARGA DESDE PC, PREVISUALIZADOR Y DESCARGA */
     async function openDetailsModal(taskId) {
         const task = globalTasks.find(t => t.id === taskId);
         if(!task) return;
 
         document.getElementById('details-activity-id').value = task.id;
         document.getElementById('details-modal-title').innerText = task.title;
-        document.getElementById('details-modal-subtitle').innerText = `Estación: ${task.station || 'N/A'} | Asignado a: ${task.assigned_to}`;
+        document.getElementById('details-modal-subtitle').innerText = `Process: ${task.station || 'N/A'} | Owner: ${task.assigned_to}`;
 
         document.getElementById('details-modal').classList.remove('hidden');
         document.getElementById('details-modal').classList.add('flex');
 
-        switchDetailsTab('comments');
+        switchDetailsTab('attachments');
         await loadDetails(task.id);
     }
 
@@ -1012,7 +1070,7 @@
     async function loadDetails(activityId) {
         try {
             const res = await tursoQuery([{
-                sql: "SELECT id, type, content, author, created_at, file_name, file_type FROM activity_details WHERE activity_id = ? ORDER BY id DESC",
+                sql: "SELECT id, type, content, created_at, author, file_name, file_type FROM activity_details WHERE activity_id = ? ORDER BY id DESC",
                 args: [Number(activityId)]
             }]);
 
@@ -1031,8 +1089,8 @@
                 const detailId = Number(r[0].value);
                 const type = r[1].value;
                 const content = r[2].value;
-                const author = r[3]?.value || 'Anónimo';
-                const date = r[4].value;
+                const date = r[3].value;
+                const author = r[4]?.value || 'Anónimo';
                 const fileName = r[5]?.value || 'Archivo Adjunto';
                 const fileType = r[6]?.value || '';
 
@@ -1080,14 +1138,13 @@
             });
 
             if(commentsCount === 0) commentsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No hay comentarios aún.</p>`;
-            if(attachmentsCount === 0) attachmentsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No hay archivos adjuntos.</p>`;
+            if(attachmentsCount === 0) attachmentsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No hay archivos Evidence anexados.</p>`;
 
         } catch(e) {
             console.error("Error al cargar detalles:", e);
         }
     }
 
-    /* PREVISUALIZACIÓN DE ARCHIVOS */
     function openPreviewModal(detailId) {
         const item = loadedAttachmentsMap[detailId];
         if (!item) return;
@@ -1108,7 +1165,7 @@
             container.innerHTML = `
                 <div class="text-center p-8 max-w-sm">
                     <i class="fa-solid fa-file-lines text-6xl text-slate-600 mb-4"></i>
-                    <p class="text-xs text-slate-400 mb-4">La previsualización en vivo no está disponible para este tipo de archivo (<strong>${item.fileType || 'Desconocido'}</strong>).</p>
+                    <p class="text-xs text-slate-400 mb-4">Previsualización en vivo no disponible para <strong>${item.fileType || 'Desconocido'}</strong>.</p>
                     <a href="${item.dataUrl}" download="${item.fileName}" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition inline-flex items-center gap-2">
                         <i class="fa-solid fa-download"></i> Descargar Archivo Directamente
                     </a>
@@ -1140,8 +1197,8 @@
 
             try {
                 await tursoQuery([{
-                    sql: "INSERT INTO activity_details (activity_id, type, content, author, created_at) VALUES (?, ?, ?, ?, ?)",
-                    args: [Number(activityId), 'comment', String(content), String(authorName), String(dateStr)]
+                    sql: "INSERT INTO activity_details (activity_id, type, content, created_at, author) VALUES (?, ?, ?, ?, ?)",
+                    args: [Number(activityId), 'comment', String(content), String(dateStr), String(authorName)]
                 }]);
                 input.value = '';
                 await loadDetails(activityId);
@@ -1153,12 +1210,12 @@
             const file = fileInput.files[0];
 
             if(!file) {
-                alert("Por favor selecciona un archivo desde tu computadora.");
+                alert("Selecciona un archivo.");
                 return;
             }
 
             if (file.size > 3 * 1024 * 1024) {
-                alert("El archivo excede el límite permitido para carga directa (Máximo 3 MB).");
+                alert("El archivo excede el límite permitido (Máximo 3 MB).");
                 return;
             }
 
@@ -1172,17 +1229,18 @@
 
                 try {
                     await tursoQuery([{
-                        sql: "INSERT INTO activity_details (activity_id, type, content, author, created_at, file_name, file_type) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                        args: [Number(activityId), 'attachment', String(base64Data), String(authorName), String(dateStr), String(file.name), String(file.type)]
+                        sql: "INSERT INTO activity_details (activity_id, type, content, created_at, author, file_name, file_type) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        args: [Number(activityId), 'attachment', String(base64Data), String(dateStr), String(authorName), String(file.name), String(file.type)]
                     }]);
 
                     fileInput.value = '';
                     await loadDetails(activityId);
+                    await loadTasks();
                 } catch(err) {
-                    alert("Error al guardar el archivo en la BD: " + err.message);
+                    alert("Error al guardar el archivo: " + err.message);
                 } finally {
                     btnUpload.disabled = false;
-                    btnUpload.innerHTML = `<i class="fa-solid fa-upload"></i> Subir a Base de Datos`;
+                    btnUpload.innerHTML = `<i class="fa-solid fa-upload"></i> Subir Evidence a Base de Datos`;
                 }
             };
 
@@ -1190,12 +1248,11 @@
         }
     }
 
-    /* VISTA Y SEGUIMIENTO DE ACTIVIDADES */
     async function loadTasks() {
         try {
             let rows = [];
             try {
-                const res = await tursoQuery(["SELECT id, title, assigned_to, start_date, end_date, progress, status, priority, station FROM activities ORDER BY id DESC"]);
+                const res = await tursoQuery(["SELECT id, title, assigned_to, start_date, end_date, progress, status, priority, station, action_taken FROM activities ORDER BY id DESC"]);
                 rows = res[0]?.response?.result?.rows || [];
             } catch(err) {
                 await tursoQuery([
@@ -1208,10 +1265,11 @@
                         progress INTEGER,
                         status TEXT,
                         priority TEXT,
-                        station TEXT
+                        station TEXT,
+                        action_taken TEXT
                     )`
                 ]);
-                const resRetry = await tursoQuery(["SELECT id, title, assigned_to, start_date, end_date, progress, status, priority, station FROM activities ORDER BY id DESC"]);
+                const resRetry = await tursoQuery(["SELECT id, title, assigned_to, start_date, end_date, progress, status, priority, station, action_taken FROM activities ORDER BY id DESC"]);
                 rows = resRetry[0]?.response?.result?.rows || [];
             }
 
@@ -1222,14 +1280,39 @@
                 start_date: r[3]?.value || '',
                 end_date: r[4]?.value || '',
                 progress: Number(r[5]?.value || 0),
-                status: r[6]?.value || 'Pendiente',
+                status: r[6]?.value || 'Open',
                 priority: r[7]?.value || 'Media',
-                station: r[8]?.value || ''
+                station: r[8]?.value || '',
+                action_taken: r[9]?.value || ''
             }));
 
+            await loadEvidencesMap();
             filterTasks();
         } catch(e) {
             console.error("Error al cargar actividades:", e);
+        }
+    }
+
+    async function loadEvidencesMap() {
+        try {
+            const res = await tursoQuery(["SELECT id, activity_id, content, file_name, file_type FROM activity_details WHERE type = 'attachment' ORDER BY id DESC"]);
+            const rows = res[0]?.response?.result?.rows || [];
+            
+            globalEvidencesMap = {};
+            rows.forEach(r => {
+                const actId = Number(r[1].value);
+                if (!globalEvidencesMap[actId]) {
+                    globalEvidencesMap[actId] = [];
+                }
+                globalEvidencesMap[actId].push({
+                    id: Number(r[0].value),
+                    dataUrl: r[2]?.value || '#',
+                    fileName: r[3]?.value || 'Evidence',
+                    fileType: r[4]?.value || ''
+                });
+            });
+        } catch(err) {
+            console.error("Error al mapear evidencias:", err);
         }
     }
 
@@ -1239,52 +1322,50 @@
         tbody.innerHTML = '';
 
         if (tasksList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="11" class="text-center p-6 text-slate-500">No se encontraron tareas registradas.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="10" class="text-center p-6 text-slate-500">No se encontraron actividades registradas.</td></tr>`;
             return;
         }
 
-        tasksList.forEach(t => {
+        tasksList.forEach((t, index) => {
+            const evidenceItems = globalEvidencesMap[t.id] || [];
+            let evidenceCellHtml = `<span class="text-slate-600 text-[11px] italic">Sin evidencias</span>`;
+
+            if (evidenceItems.length > 0) {
+                evidenceCellHtml = `<div class="flex flex-col gap-1">`;
+                evidenceItems.forEach(item => {
+                    evidenceCellHtml += `
+                        <a href="${item.dataUrl}" download="${item.fileName}" title="Clic para descargar" class="text-blue-400 hover:text-blue-300 underline font-semibold text-[11px] flex items-center gap-1.5 truncate max-w-[150px]">
+                            <i class="fa-solid fa-paperclip text-amber-400 text-[10px]"></i> ${item.fileName}
+                        </a>`;
+                });
+                evidenceCellHtml += `</div>`;
+            }
+
             tbody.innerHTML += `
-                <tr class="hover:bg-slate-800/30 border-b border-slate-800/60">
-                    <td class="p-3.5 font-mono text-slate-500">#${t.id}</td>
-                    <td class="p-3.5 font-semibold text-white">${t.title}</td>
+                <tr class="hover:bg-slate-800/30 border-b border-slate-800/60 text-xs">
+                    <td class="p-3.5 font-mono text-slate-400 font-bold">${index + 1}</td>
+                    <td class="p-3.5 font-medium text-slate-200 max-w-[220px]">${t.title}</td>
                     <td class="p-3.5 text-indigo-300 font-medium">${t.station || '<span class="text-slate-600">N/A</span>'}</td>
-                    <td class="p-3.5 text-slate-300">${t.assigned_to}</td>
-                    <td class="p-3.5">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${getPriorityBadgeClass(t.priority)}">
-                            ${t.priority || 'Media'}
-                        </span>
-                    </td>
+                    <td class="p-3.5 text-slate-300 font-semibold">${t.assigned_to}</td>
+                    <td class="p-3.5 text-slate-400 max-w-[200px] leading-tight">${t.action_taken || '<span class="text-slate-600 italic">Sin descripción</span>'}</td>
+                    <td class="p-3.5">${evidenceCellHtml}</td>
                     <td class="p-3.5 text-slate-400 font-mono text-[11px]">${t.start_date}</td>
                     <td class="p-3.5 text-slate-400 font-mono text-[11px]">${t.end_date}</td>
-                    <td class="p-3.5 w-28">
-                        <div class="flex items-center gap-2">
-                            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                                <div class="bg-blue-500 h-1.5 rounded-full" style="width: ${t.progress}%"></div>
-                            </div>
-                            <span class="text-[10px] text-slate-400 font-mono">${t.progress}%</span>
-                        </div>
-                    </td>
                     <td class="p-3.5">
-                        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold border ${getStatusBadgeClass(t.status)}">
+                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold border ${getStatusBadgeClass(t.status)}">
                             ${t.status}
                         </span>
                     </td>
-                    <td class="p-3.5 text-center">
-                        <button onclick="openDetailsModal(${t.id})" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-lg transition text-[11px] flex items-center gap-1.5 mx-auto font-semibold">
-                            <i class="fa-solid fa-folder-open text-amber-400"></i> Ver
-                        </button>
-                    </td>
-                    <td class="p-3.5 text-right space-x-2">
-                        <button onclick="editTask(${t.id})" class="text-blue-400 hover:text-blue-300 transition"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteTask(${t.id})" class="text-rose-400 hover:text-rose-300 transition"><i class="fa-solid fa-trash"></i></button>
+                    <td class="p-3.5 text-right space-x-2 whitespace-nowrap">
+                        <button onclick="openDetailsModal(${t.id})" title="Evidencias y comentarios" class="text-amber-400 hover:text-amber-300 transition px-1"><i class="fa-solid fa-folder-open"></i></button>
+                        <button onclick="editTask(${t.id})" title="Editar actividad" class="text-blue-400 hover:text-blue-300 transition px-1"><i class="fa-solid fa-pen"></i></button>
+                        <button onclick="deleteTask(${t.id})" title="Eliminar actividad" class="text-rose-400 hover:text-rose-300 transition px-1"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
             `;
         });
     }
 
-    /* UTILERÍAS Y NAVEGACIÓN */
     function checkSavedSession() {
         const savedSession = JSON.parse(localStorage.getItem('tracker_session'));
         if (savedSession && savedSession.isLoggedIn) {
@@ -1386,8 +1467,8 @@
             const filterSelect = document.getElementById('filter-user');
             const taskSelect = document.getElementById('task-assigned');
 
-            if(filterSelect) filterSelect.innerHTML = '<option value="">Todos los Responsables</option>';
-            if(taskSelect) taskSelect.innerHTML = '<option value="">Selecciona Responsable...</option>';
+            if(filterSelect) filterSelect.innerHTML = '<option value="">Todos los Owners</option>';
+            if(taskSelect) taskSelect.innerHTML = '<option value="">Selecciona Owner (Name)...</option>';
 
             globalUsers.forEach(u => {
                 if (u.username) {
@@ -1484,7 +1565,7 @@
         const priorityFilter = document.getElementById('filter-priority')?.value || '';
 
         const filtered = globalTasks.filter(t => {
-            const matchesSearch = t.title.toLowerCase().includes(search);
+            const matchesSearch = t.title.toLowerCase().includes(search) || (t.action_taken && t.action_taken.toLowerCase().includes(search));
             const matchesUser = userFilter === '' || t.assigned_to === userFilter;
             const matchesStatus = statusFilter === '' || t.status === statusFilter;
             const matchesPriority = priorityFilter === '' || t.priority === priorityFilter;
@@ -1499,7 +1580,7 @@
     function openTaskModal() {
         document.getElementById('task-form').reset();
         document.getElementById('task-id').value = '';
-        document.getElementById('modal-title').innerText = 'Nueva Actividad';
+        document.getElementById('modal-title').innerText = 'Nueva Actividad Gemba';
         document.getElementById('task-modal').classList.remove('hidden');
         document.getElementById('task-modal').classList.add('flex');
     }
@@ -1514,22 +1595,24 @@
         if(!t) return;
 
         openTaskModal();
-        document.getElementById('modal-title').innerText = 'Editar Actividad';
+        document.getElementById('modal-title').innerText = 'Editar Actividad Gemba';
         document.getElementById('task-id').value = t.id;
         document.getElementById('task-title').value = t.title;
+        document.getElementById('task-action-taken').value = t.action_taken || '';
         document.getElementById('task-station').value = t.station || '';
         document.getElementById('task-assigned').value = t.assigned_to;
         document.getElementById('task-priority').value = t.priority || 'Media';
         document.getElementById('task-start').value = t.start_date;
         document.getElementById('task-end').value = t.end_date;
         document.getElementById('task-progress').value = t.progress;
-        document.getElementById('task-status').value = t.status;
+        document.getElementById('task-status').value = t.status || 'Open';
     }
 
     async function saveTask(e) {
         e.preventDefault();
         const id = document.getElementById('task-id').value;
         const title = document.getElementById('task-title').value.trim();
+        const action_taken = document.getElementById('task-action-taken').value.trim();
         const station = document.getElementById('task-station').value;
         const priority = document.getElementById('task-priority').value; 
         const assigned = document.getElementById('task-assigned').value;
@@ -1539,20 +1622,20 @@
         const status = document.getElementById('task-status').value;
 
         if (!assigned || !station) {
-            alert("Selecciona un responsable y una estación.");
+            alert("Selecciona un Owner y un Process (estación).");
             return;
         }
 
         try {
             if (id) {
                 await tursoQuery([{
-                    sql: "UPDATE activities SET title = ?, station = ?, assigned_to = ?, start_date = ?, end_date = ?, progress = ?, status = ?, priority = ? WHERE id = ?",
-                    args: [title, station, assigned, start, end, progress, status, priority, Number(id)]
+                    sql: "UPDATE activities SET title = ?, station = ?, assigned_to = ?, start_date = ?, end_date = ?, progress = ?, status = ?, priority = ?, action_taken = ? WHERE id = ?",
+                    args: [title, station, assigned, start, end, progress, status, priority, action_taken, Number(id)]
                 }]);
             } else {
                 await tursoQuery([{
-                    sql: "INSERT INTO activities (title, station, assigned_to, start_date, end_date, progress, status, priority) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    args: [title, station, assigned, start, end, progress, status, priority]
+                    sql: "INSERT INTO activities (title, station, assigned_to, start_date, end_date, progress, status, priority, action_taken) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    args: [title, station, assigned, start, end, progress, status, priority, action_taken]
                 }]);
             }
 
@@ -1576,19 +1659,11 @@
         }
     }
 
-    function getPriorityBadgeClass(priority) {
-        switch(priority) {
-            case 'Alta': case 'High': return 'bg-rose-950/80 border-rose-700 text-rose-300';
-            case 'Media': case 'Medium': return 'bg-amber-950/80 border-amber-700 text-amber-300';
-            case 'Baja': case 'Low': default: return 'bg-slate-800 border-slate-700 text-slate-400';
-        }
-    }
-
     function getStatusBadgeClass(status) {
         switch(status) {
-            case 'Completado': case 'Completed': case 'Finalizada': return 'bg-emerald-950/60 border-emerald-800/80 text-emerald-400';
-            case 'En Proceso': case 'In Progress': return 'bg-amber-950/60 border-amber-800/80 text-amber-400';
-            case 'Pendiente': case 'Pending': default: return 'bg-rose-950/60 border-rose-800/80 text-rose-400';
+            case 'Closed': case 'Completado': case 'Finalizada': return 'bg-emerald-950/60 border-emerald-800/80 text-emerald-400';
+            case 'In Progress': case 'En Proceso': return 'bg-amber-950/60 border-amber-800/80 text-amber-400';
+            case 'Open': case 'Pendiente': default: return 'bg-rose-950/60 border-rose-800/80 text-rose-400';
         }
     }
 
@@ -1630,8 +1705,8 @@
             }
 
             let barColor = 'bg-rose-600';
-            if (t.status === 'Completado' || t.status === 'Finalizada') barColor = 'bg-emerald-500';
-            else if (t.status === 'En Proceso') barColor = 'bg-amber-500';
+            if (t.status === 'Closed' || t.status === 'Completado') barColor = 'bg-emerald-500';
+            else if (t.status === 'In Progress' || t.status === 'En Proceso') barColor = 'bg-amber-500';
 
             html += `
                 <div>
@@ -1655,11 +1730,11 @@
 
     function renderMetricsAndCharts(tasksList) {
         const total = tasksList.length;
-        const completed = tasksList.filter(t => t.status === 'Completado' || t.status === 'Finalizada').length;
+        const completed = tasksList.filter(t => t.status === 'Closed' || t.status === 'Completado' || t.status === 'Finalizada').length;
         
         const today = new Date();
         const dueSoon = tasksList.filter(t => {
-            if (t.status === 'Completado' || t.status === 'Finalizada') return false;
+            if (t.status === 'Closed' || t.status === 'Completado' || t.status === 'Finalizada') return false;
             const endDate = new Date(t.end_date);
             const diffTime = endDate - today;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -1690,16 +1765,16 @@
         const chartCanvas = document.getElementById('statusChart');
         if(!chartCanvas) return;
         const ctxDoughnut = chartCanvas.getContext('2d');
-        const pending = tasksList.filter(t => t.status === 'Pendiente').length;
-        const inProgress = tasksList.filter(t => t.status === 'En Proceso').length;
-        const completed = tasksList.filter(t => t.status === 'Completado' || t.status === 'Finalizada').length;
+        const pending = tasksList.filter(t => t.status === 'Open' || t.status === 'Pendiente').length;
+        const inProgress = tasksList.filter(t => t.status === 'In Progress' || t.status === 'En Proceso').length;
+        const completed = tasksList.filter(t => t.status === 'Closed' || t.status === 'Completado' || t.status === 'Finalizada').length;
 
         if (statusChartInstance) statusChartInstance.destroy();
 
         statusChartInstance = new Chart(ctxDoughnut, {
             type: 'doughnut',
             data: {
-                labels: ['Pendiente', 'En Proceso', 'Completado'],
+                labels: ['Open', 'In Progress', 'Closed'],
                 datasets: [{
                     data: [pending, inProgress, completed],
                     backgroundColor: ['#e11d48', '#f59e0b', '#10b981'],
@@ -1734,9 +1809,9 @@
         const ctxBar = document.getElementById('userBarChart').getContext('2d');
         const userLabels = Array.from(new Set(tasksList.map(t => t.assigned_to).filter(Boolean)));
 
-        const pendingData = userLabels.map(u => tasksList.filter(t => t.assigned_to === u && t.status === 'Pendiente').length);
-        const inProgressData = userLabels.map(u => tasksList.filter(t => t.assigned_to === u && t.status === 'En Proceso').length);
-        const completedData = userLabels.map(u => tasksList.filter(t => (t.status === 'Completado' || t.status === 'Finalizada') && t.assigned_to === u).length);
+        const pendingData = userLabels.map(u => tasksList.filter(t => t.assigned_to === u && (t.status === 'Open' || t.status === 'Pendiente')).length);
+        const inProgressData = userLabels.map(u => tasksList.filter(t => t.assigned_to === u && (t.status === 'In Progress' || t.status === 'En Proceso')).length);
+        const completedData = userLabels.map(u => tasksList.filter(t => t.assigned_to === u && (t.status === 'Closed' || t.status === 'Completado' || t.status === 'Finalizada')).length);
 
         if (barChartInstance) barChartInstance.destroy();
 
@@ -1745,9 +1820,9 @@
             data: {
                 labels: userLabels.length ? userLabels : ['Sin datos'],
                 datasets: [
-                    { label: 'Pendiente', data: userLabels.length ? pendingData : [0], backgroundColor: '#e11d48', borderRadius: 4 },
-                    { label: 'En Proceso', data: userLabels.length ? inProgressData : [0], backgroundColor: '#f59e0b', borderRadius: 4 },
-                    { label: 'Completado', data: userLabels.length ? completedData : [0], backgroundColor: '#10b981', borderRadius: 4 }
+                    { label: 'Open', data: userLabels.length ? pendingData : [0], backgroundColor: '#e11d48', borderRadius: 4 },
+                    { label: 'In Progress', data: userLabels.length ? inProgressData : [0], backgroundColor: '#f59e0b', borderRadius: 4 },
+                    { label: 'Closed', data: userLabels.length ? completedData : [0], backgroundColor: '#10b981', borderRadius: 4 }
                 ]
             },
             options: {
