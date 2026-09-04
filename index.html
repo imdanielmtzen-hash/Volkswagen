@@ -16,11 +16,33 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spinner {
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 <body class="font-sans antialiased text-slate-200">
 
-    <!-- LOGIN OVERLAY -->
+    <!-- OVERLAY DE CARGA CON PROGRESS BAR CIRCULAR -->
+    <div id="loading-overlay" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-[100] flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="flex flex-col items-center gap-4 bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-2xl">
+            <svg class="animate-spinner h-12 w-12 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <div class="text-center">
+                <h3 class="text-sm font-bold text-white mb-1">Conectando a Turso DB</h3>
+                <p id="loading-status" class="text-xs text-slate-400">Cargando datos del sistema...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-slate-950 z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
             <div class="text-center mb-6">
@@ -63,7 +85,6 @@
         </div>
     </div>
 
-    <!-- Header Navigation Bar -->
     <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-4">
             <div class="flex items-center gap-3">
@@ -108,7 +129,6 @@
         </div>
     </header>
 
-    <!-- MENU FULL SCREEN OVERLAY -->
     <div id="fullscreen-menu" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md hidden z-50 flex-col justify-between p-6 sm:p-12 transition-all">
         <div class="flex justify-between items-center border-b border-slate-800 pb-6">
             <div class="flex items-center gap-3">
@@ -153,7 +173,6 @@
 
     <main class="max-w-7xl mx-auto px-4 py-6">
 
-        <!-- VISTA DE ACTIVIDADES -->
         <div id="view-activities" class="space-y-6">
 
             <div id="overdue-alert" class="hidden bg-rose-950/40 border border-rose-800/60 rounded-xl p-4 flex items-center gap-3 text-rose-300">
@@ -166,7 +185,6 @@
                 </div>
             </div>
 
-            <!-- Métricas KPI Cards -->
             <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex items-center gap-4">
                     <div class="p-3 bg-blue-600/10 border border-blue-500/20 text-blue-400 rounded-xl">
@@ -209,7 +227,6 @@
                 </div>
             </section>
 
-            <!-- Sección de Gráficos -->
             <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
                     <h3 class="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
@@ -230,7 +247,6 @@
                 </div>
             </section>
 
-            <!-- Listado General de Actividades -->
             <section class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
                 <div class="p-4 border-b border-slate-800 flex flex-wrap gap-4 items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -251,9 +267,9 @@
                         </select>
                         <select id="filter-status" onchange="filterTasks()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
                             <option value="">Todos los Estados</option>
-                            <option value="Pendiente">Pendiente</option>
-                            <option value="En Proceso">En Proceso</option>
-                            <option value="Completado">Completado</option>
+                            <option value="Pendiente">Pendiente / Open</option>
+                            <option value="En Proceso">En Proceso / In Progress</option>
+                            <option value="Completado">Completado / Closed</option>
                         </select>
                         <select id="filter-user" onchange="filterTasks()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
                             <option value="">Todos los Responsables</option>
@@ -294,7 +310,6 @@
                 </div>
             </section>
 
-            <!-- Gantt Interactivo -->
             <section class="bg-slate-900 border border-slate-800 p-5 rounded-xl">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2">
@@ -307,7 +322,6 @@
 
         </div>
 
-        <!-- VISTA DE USUARIOS -->
         <div id="view-users" class="hidden">
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-xl">
                 <div class="flex justify-between items-center mb-6">
@@ -343,7 +357,6 @@
 
     </main>
 
-    <!-- MODAL GESTIONAR ESTACIONES -->
     <div id="stations-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 relative flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -379,7 +392,6 @@
         </div>
     </div>
 
-    <!-- MODAL CAMBIAR CONTRASEÑA -->
     <div id="password-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 relative">
             <h3 class="text-base font-bold text-white mb-1">Cambiar Contraseña</h3>
@@ -412,7 +424,6 @@
         </div>
     </div>
 
-    <!-- Modal Tarea -->
     <div id="task-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-lg p-6 relative">
             <h3 id="modal-title" class="text-base font-bold text-white mb-4">Nueva Actividad</h3>
@@ -468,9 +479,9 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-400 mb-1">Status</label>
                         <select id="task-status" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-                            <option value="Open">Open</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Closed">Closed</option>
+                            <option value="Open">Open / Pendiente</option>
+                            <option value="In Progress">In Progress / En Proceso</option>
+                            <option value="Closed">Closed / Completado</option>
                         </select>
                     </div>
                 </div>
@@ -483,7 +494,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE ADJUNTOS Y COMENTARIOS -->
     <div id="details-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-3xl p-6 relative flex flex-col max-h-[90vh]">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -533,7 +543,6 @@
         </div>
     </div>
 
-    <!-- MODAL PREVISUALIZACIÓN -->
     <div id="preview-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md hidden items-center justify-center z-[60] p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl h-[85vh] p-6 relative flex flex-col">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
@@ -548,12 +557,10 @@
                     <button onclick="closePreviewModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
                 </div>
             </div>
-            
             <div id="preview-container" class="flex-1 bg-slate-950 rounded-xl border border-slate-800/80 overflow-hidden flex items-center justify-center p-2 relative"></div>
         </div>
     </div>
 
-    <!-- Modal Usuario -->
     <div id="user-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 relative">
             <h3 class="text-base font-bold text-white mb-4">Anexar a Tabla `users`</h3>
@@ -566,6 +573,7 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
                     <input type="text" id="new-password" placeholder="Opcional" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
                 </div>
+
                 <div class="flex justify-end gap-2 border-t border-slate-800 pt-4">
                     <button type="button" onclick="closeUserModal()" class="px-4 py-2 border border-slate-800 rounded-lg text-xs font-semibold text-slate-400 hover:bg-slate-800 hover:text-white transition">Cancelar</button>
                     <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-semibold transition">Guardar</button>
@@ -574,1300 +582,1171 @@
         </div>
     </div>
 
-    <!-- Script con Adaptador JSONP para Localhost/File sin CORS error -->
     <script>
-    if (typeof ChartDataLabels !== 'undefined') {
-        Chart.register(ChartDataLabels);
-    }
-
-    const TURSO_URL = "https://volskwagen-ingdanielmtz.aws-us-west-2.turso.io";
-    const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODg1NDU2NDQsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.gcakKk4LSHEkWuCFP4rpHSpBYtJcc7IiATImmPXyH7rDXWN1iyBOzmJHnPKIWetNv8LbQyJnhysZCOiUVchHDQ";
-
-    let currentRole = 'admin';
-    let globalTasks = [];
-    let globalUsers = [];
-    let globalStations = [];
-    let loadedAttachmentsMap = {};
-    let globalEvidencesMap = {};
-
-    let statusChartInstance = null;
-    let barChartInstance = null;
-
-    function formatTursoArg(arg) {
-        if (arg === null || arg === undefined) return { type: "null" };
-        if (typeof arg === "number") {
-            return Number.isInteger(arg) ? { type: "integer", value: String(arg) } : { type: "float", value: arg };
+        if (typeof ChartDataLabels !== 'undefined') {
+            Chart.register(ChartDataLabels);
         }
-        if (typeof arg === "object" && arg.type && "value" in arg) return arg;
-        return { type: "text", value: String(arg) };
-    }
 
-    async function tursoQuery(statements) {
-        const requests = [{ type: "execute", stmt: { sql: "BEGIN" } }];
-        statements.forEach(s => {
-            if (typeof s === 'string') {
-                requests.push({ type: "execute", stmt: { sql: s } });
-            } else if (typeof s === 'object') {
-                const stmtObj = { sql: s.sql };
-                if (s.args) stmtObj.args = s.args.map(formatTursoArg);
-                requests.push({ type: "execute", stmt: stmtObj });
+        const TURSO_URL = "https://volskwagen-ingdanielmtz.aws-us-west-2.turso.io";
+        const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODg1NDk5ODgsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.zjEdDOnrC_HlVh8leJeiLxPLGcQEJIy8UAUspDKVVYpLuVcL1rMZ_pmhSRf2I9lZSjA59rhTlicrlE9xb8lEBg";
+
+        let currentRole = 'admin';
+        let globalTasks = [];
+        let globalUsers = [];
+        let globalStations = [];
+        let statusChartInstance = null;
+        let barChartInstance = null;
+
+        function showLoader(message = "Cargando datos del sistema...") {
+            const overlay = document.getElementById('loading-overlay');
+            document.getElementById('loading-status').textContent = message;
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+        }
+
+        function hideLoader() {
+            const overlay = document.getElementById('loading-overlay');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+        }
+
+        function formatTursoArg(arg) {
+            if (arg === null || arg === undefined) return { type: "null" };
+            if (typeof arg === "number") {
+                return Number.isInteger(arg) ? { type: "integer", value: String(arg) } : { type: "float", value: arg };
             }
-        });
-        requests.push({ type: "execute", stmt: { sql: "COMMIT" } });
+            if (typeof arg === "object" && arg.type && "value" in arg) return arg;
+            return { type: "text", value: String(arg) };
+        }
 
-        try {
+        async function tursoQuery(statements) {
+            const requests = [{ type: "execute", stmt: { sql: "BEGIN" } }];
+            statements.forEach(s => {
+                if (typeof s === 'string') {
+                    requests.push({ type: "execute", stmt: { sql: s } });
+                } else if (typeof s === 'object' && s.sql) {
+                    const args = (s.args || []).map(formatTursoArg);
+                    requests.push({ type: "execute", stmt: { sql: s.sql, args: args } });
+                }
+            });
+            requests.push({ type: "execute", stmt: { sql: "COMMIT" } });
+
             const response = await fetch(`${TURSO_URL}/v2/pipeline`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Authorization': `Bearer ${TURSO_TOKEN}`,
-                    'Content-Type': 'application/json'
+                    "Authorization": `Bearer ${TURSO_TOKEN}`,
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ requests })
             });
 
             if (!response.ok) {
                 const errText = await response.text();
-                throw new Error(`HTTP ${response.status}: ${errText}`);
+                throw new Error(`Error en Turso Pipeline API: ${errText}`);
             }
 
             const data = await response.json();
-            data.results.forEach(res => {
-                if (res.type === "error") {
-                    throw new Error(res.error?.message || "Error al ejecutar consulta SQL en Turso");
-                }
-            });
-
-            return data.results.slice(1, -1);
-        } catch (fetchErr) {
-            return new Promise((resolve, reject) => {
-                const callbackName = 'turso_cb_' + Math.random().toString(36).substr(2, 9);
-                window[callbackName] = function(data) {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    if (data && data.results) {
-                        resolve(data.results.slice(1, -1));
-                    } else {
-                        reject(new Error("Error procesando respuesta JSONP local."));
-                    }
-                };
-
-                const script = document.createElement('script');
-                const reqParam = encodeURIComponent(JSON.stringify({ requests }));
-                script.src = `${TURSO_URL}/v2/pipeline?authToken=${TURSO_TOKEN}&callback=${callbackName}&json=${reqParam}`;
-                script.onerror = () => {
-                    delete window[callbackName];
-                    document.body.removeChild(script);
-                    reject(new Error("Error en script dinámico. Verifique conectividad a internet."));
-                };
-                document.body.appendChild(script);
-            });
-        }
-    }
-
-    window.onload = function() {
-        checkSavedSession();
-        initDB();
-    };
-
-    async function initDB() {
-        try {
-            await tursoQuery([
-                `CREATE TABLE IF NOT EXISTS activities (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    title TEXT,
-                    assigned_to TEXT,
-                    start_date TEXT,
-                    end_date TEXT,
-                    progress INTEGER,
-                    status TEXT,
-                    priority TEXT,
-                    station TEXT,
-                    action_taken TEXT
-                )`,
-                `CREATE TABLE IF NOT EXISTS activity_details (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    activity_id INTEGER,
-                    type TEXT,
-                    content TEXT,
-                    created_at TEXT,
-                    author TEXT,
-                    file_name TEXT,
-                    file_type TEXT
-                )`,
-                `CREATE TABLE IF NOT EXISTS stations (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT UNIQUE
-                )`
-            ]);
-
-            try { await tursoQuery(["ALTER TABLE activity_details ADD COLUMN author TEXT"]); } catch(e) {}
-            try { await tursoQuery(["ALTER TABLE activity_details ADD COLUMN file_name TEXT"]); } catch(e) {}
-            try { await tursoQuery(["ALTER TABLE activity_details ADD COLUMN file_type TEXT"]); } catch(e) {}
-            try { await tursoQuery(["ALTER TABLE activities ADD COLUMN station TEXT"]); } catch(e) {}
-            try { await tursoQuery(["ALTER TABLE activities ADD COLUMN action_taken TEXT"]); } catch(e) {}
-
-            await loadUsers();
-            await loadStations();
-            await loadTasks();
-        } catch (err) {
-            console.error("Error inicializando tablas en Turso:", err);
-        }
-    }
-
-    async function loadStations() {
-        try {
-            const res = await tursoQuery(["SELECT id, name FROM stations ORDER BY name ASC"]);
-            const rows = res[0]?.response?.result?.rows || [];
-            
-            globalStations = rows.map(r => ({
-                id: Number(r[0].value),
-                name: r[1].value
-            }));
-
-            const taskStationSelect = document.getElementById('task-station');
-            if (taskStationSelect) {
-                taskStationSelect.innerHTML = '<option value="">Selecciona Process (Estación)...</option>';
-                globalStations.forEach(st => {
-                    taskStationSelect.innerHTML += `<option value="${st.name}">${st.name}</option>`;
-                });
-            }
-
-            renderStationsTable();
-        } catch (err) {
-            console.error("Error al cargar estaciones:", err);
-        }
-    }
-
-    function openStationsModal() {
-        document.getElementById('new-station-name').value = '';
-        document.getElementById('stations-modal').classList.remove('hidden');
-        document.getElementById('stations-modal').classList.add('flex');
-        renderStationsTable();
-    }
-
-    function closeStationsModal() {
-        document.getElementById('stations-modal').classList.add('hidden');
-        document.getElementById('stations-modal').classList.remove('flex');
-    }
-
-    function renderStationsTable() {
-        const tbody = document.getElementById('stations-table-body');
-        if (!tbody) return;
-        tbody.innerHTML = '';
-
-        if (globalStations.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-slate-500">No hay estaciones registradas.</td></tr>`;
-            return;
+            return data.results.slice(1, -1).map(r => r.response?.result);
         }
 
-        globalStations.forEach(st => {
-            tbody.innerHTML += `
-                <tr class="hover:bg-slate-800/40 border-b border-slate-800/60">
-                    <td class="p-3 font-mono text-slate-500">#${st.id}</td>
-                    <td class="p-3 font-semibold text-white">${st.name}</td>
-                    <td class="p-3 text-right">
-                        <button onclick="deleteStation(${st.id})" class="text-rose-400 hover:text-rose-300 transition"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    async function saveStation(e) {
-        e.preventDefault();
-        const input = document.getElementById('new-station-name');
-        const stationName = input.value.trim();
-        if (!stationName) return;
-
-        try {
-            await tursoQuery([{
-                sql: "INSERT INTO stations (name) VALUES (?)",
-                args: [String(stationName)]
-            }]);
-            input.value = '';
-            await loadStations();
-        } catch (err) {
-            alert("Error al guardar estación: " + err.message);
-        }
-    }
-
-    async function deleteStation(id) {
-        if (!confirm("¿Desea eliminar esta estación?")) return;
-        try {
-            await tursoQuery([{
-                sql: "DELETE FROM stations WHERE id = ?",
-                args: [Number(id)]
-            }]);
-            await loadStations();
-        } catch (err) {
-            alert("Error al eliminar la estación.");
-        }
-    }
-
-    async function exportToExcel() {
-        const workbook = new ExcelJS.Workbook();
-        workbook.creator = 'Tracker Pro';
-        workbook.created = new Date();
-
-        const wsDash = workbook.addWorksheet('Dashboard', { views: [{ showGridLines: true }] });
-
-        wsDash.mergeCells('A1:F2');
-        const titleCell = wsDash.getCell('A1');
-        titleCell.value = 'RIVIAN | VOLKSWAGEN GROUP TECHNOLOGIES - EVT 2 VFF GEMBA';
-        titleCell.font = { name: 'Arial', size: 14, bold: true, color: { argb: '000000' } };
-        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'EFEFEF' } };
-        titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
-
-        const metrics = [
-            { label: 'TOTAL ACTIVIDADES', val: document.getElementById('metric-total').innerText, col: 'A', bg: '1E293B', text: '3B82F6' },
-            { label: 'POR VENCER (3 DÍAS)', val: document.getElementById('metric-due-soon').innerText, col: 'C', bg: '1E293B', text: 'F59E0B' },
-            { label: 'COMPLETADAS', val: document.getElementById('metric-completed').innerText, col: 'E', bg: '1E293B', text: '10B981' }
-        ];
-
-        metrics.forEach(m => {
-            wsDash.getCell(`${m.col}4`).value = m.label;
-            wsDash.getCell(`${m.col}4`).font = { size: 9, bold: true, color: { argb: '94A3B8' } };
-            wsDash.getCell(`${m.col}5`).value = parseInt(m.val) || 0;
-            wsDash.getCell(`${m.col}5`).font = { size: 18, bold: true, color: { argb: m.text } };
-            wsDash.getCell(`${m.col}4`).fill = wsDash.getCell(`${m.col}5`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: m.bg } };
-        });
-
-        if (statusChartInstance) {
-            const statusImgBase64 = statusChartInstance.toBase64Image();
-            const imageId1 = workbook.addImage({ base64: statusImgBase64, extension: 'png' });
-            wsDash.addImage(imageId1, { tl: { col: 0, row: 7 }, ext: { width: 380, height: 240 } });
-        }
-
-        if (barChartInstance) {
-            const barImgBase64 = barChartInstance.toBase64Image();
-            const imageId2 = workbook.addImage({ base64: barImgBase64, extension: 'png' });
-            wsDash.addImage(imageId2, { tl: { col: 3, row: 7 }, ext: { width: 440, height: 240 } });
-        }
-
-        const wsTasks = workbook.addWorksheet('EVT 2 VFF GEMBA', { views: [{ showGridLines: true }] });
-
-        wsTasks.mergeCells('A1:C2');
-        const headerTitle1 = wsTasks.getCell('A1');
-        headerTitle1.value = "RIVIAN | VOLKSWAGEN GROUP\nT E C H N O L O G I E S";
-        headerTitle1.font = { name: 'Arial', size: 10, bold: true };
-        headerTitle1.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
-
-        wsTasks.mergeCells('D1:I2');
-        const headerTitle2 = wsTasks.getCell('D1');
-        headerTitle2.value = "EVT 2 VFF GEMBA";
-        headerTitle2.font = { name: 'Arial', size: 14, bold: true };
-        headerTitle2.alignment = { horizontal: 'center', vertical: 'middle' };
-
-        const headers = ['#', 'Problem Identified', 'Process', 'Owner (Name)', 'Action Taken', 'Evidence', 'Due Date', 'Date of Implementation', 'Status'];
-        
-        wsTasks.getRow(4).values = headers;
-        const headerRow = wsTasks.getRow(4);
-        headerRow.height = 28;
-
-        headerRow.eachCell((cell) => {
-            cell.font = { name: 'Arial', size: 10, bold: true, color: { argb: '103B36' } };
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '99C2BC' } };
-            cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-            cell.border = { 
-                top: { style: 'thin', color: { argb: '7BA49F' } },
-                left: { style: 'thin', color: { argb: '7BA49F' } },
-                bottom: { style: 'thin', color: { argb: '7BA49F' } },
-                right: { style: 'thin', color: { argb: '7BA49F' } }
-            };
-        });
-
-        globalTasks.forEach((t, idx) => {
-            const evidenceItems = globalEvidencesMap[t.id] || [];
-
-            const row = wsTasks.addRow([
-                idx + 1,
-                t.title,
-                t.station || 'N/A',
-                t.assigned_to,
-                t.action_taken || '',
-                evidenceItems.length > 0 ? evidenceItems[0].fileName : 'Sin archivos',
-                t.start_date,
-                t.end_date,
-                t.status || 'Open'
-            ]);
-
-            row.height = 24;
-
-            row.eachCell((cell) => {
-                cell.font = { name: 'Arial', size: 9 };
-                cell.alignment = { vertical: 'middle', wrapText: true };
-                cell.border = {
-                    top: { style: 'thin', color: { argb: 'E0E0E0' } },
-                    left: { style: 'thin', color: { argb: 'E0E0E0' } },
-                    bottom: { style: 'thin', color: { argb: 'E0E0E0' } },
-                    right: { style: 'thin', color: { argb: 'E0E0E0' } }
-                };
-            });
-
-            row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-            row.getCell(3).alignment = { horizontal: 'center', vertical: 'middle' };
-            row.getCell(4).alignment = { horizontal: 'center', vertical: 'middle' };
-            row.getCell(7).alignment = { horizontal: 'center', vertical: 'middle' };
-            row.getCell(8).alignment = { horizontal: 'center', vertical: 'middle' };
-            row.getCell(9).alignment = { horizontal: 'center', vertical: 'middle' };
-
-            const evidenceCell = row.getCell(6);
-            if (evidenceItems.length > 0) {
-                const firstEv = evidenceItems[0];
-                if (firstEv.dataUrl && firstEv.dataUrl.startsWith('data:')) {
-                    evidenceCell.value = {
-                        text: firstEv.fileName,
-                        hyperlink: firstEv.dataUrl,
-                        tooltip: 'Clic para descargar archivo'
-                    };
-                    evidenceCell.font = { name: 'Arial', size: 9, color: { argb: '0550AE' }, underline: true };
-                } else {
-                    evidenceCell.value = firstEv.fileName;
-                }
-            } else {
-                evidenceCell.value = 'Sin adjuntos';
-                evidenceCell.font = { name: 'Arial', size: 9, color: { argb: '999999' } };
-            }
-        });
-
-        const colWidths = [6, 45, 18, 22, 35, 25, 14, 16, 12];
-        colWidths.forEach((w, i) => {
-            wsTasks.getColumn(i + 1).width = w;
-        });
-
-        const wsUsers = workbook.addWorksheet('Usuarios');
-        wsUsers.addRow(['ID', 'Username / Owner']);
-        wsUsers.getRow(1).font = { bold: true, color: { argb: 'FFFFFF' } };
-        wsUsers.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1E293B' } };
-
-        globalUsers.forEach(u => {
-            wsUsers.addRow([u.id, u.username]);
-        });
-        wsUsers.columns = [{ width: 10 }, { width: 30 }];
-
-        const buffer = await workbook.xlsx.writeBuffer();
-        saveAs(new Blob([buffer]), `GEMBA_EVT2_Report_${new Date().toISOString().slice(0, 10)}.xlsx`);
-    }
-
-    function openChangePasswordModal() {
-        const session = JSON.parse(localStorage.getItem('tracker_session'));
-        const username = session?.username || (currentRole === 'admin' ? 'Daniel' : 'Usuario');
-        
-        document.getElementById('pwd-user-label').innerText = `Usuario activo: ${username}`;
-        document.getElementById('pwd-current').value = '';
-        document.getElementById('pwd-new').value = '';
-        document.getElementById('pwd-confirm').value = '';
-        document.getElementById('pwd-error').classList.add('hidden');
-        document.getElementById('pwd-success').classList.add('hidden');
-
-        document.getElementById('password-modal').classList.remove('hidden');
-        document.getElementById('password-modal').classList.add('flex');
-    }
-
-    function closeChangePasswordModal() {
-        document.getElementById('password-modal').classList.add('hidden');
-        document.getElementById('password-modal').classList.remove('flex');
-    }
-
-    async function handlePasswordChange(e) {
-        e.preventDefault();
-        const currentPwd = document.getElementById('pwd-current').value.trim();
-        const newPwd = document.getElementById('pwd-new').value.trim();
-        const confirmPwd = document.getElementById('pwd-confirm').value.trim();
-        
-        const errDiv = document.getElementById('pwd-error');
-        const successDiv = document.getElementById('pwd-success');
-        
-        errDiv.classList.add('hidden');
-        successDiv.classList.add('hidden');
-
-        if (newPwd !== confirmPwd) {
-            errDiv.innerText = "La nueva contraseña no coincide.";
-            errDiv.classList.remove('hidden');
-            return;
-        }
-
-        const session = JSON.parse(localStorage.getItem('tracker_session'));
-        const username = session?.username || (currentRole === 'admin' ? 'Daniel' : 'Usuario');
-
-        try {
-            const res = await tursoQuery([{
-                sql: "SELECT password FROM users WHERE LOWER(username) = LOWER(?)",
-                args: [String(username)]
-            }]);
-
-            const rows = res[0]?.response?.result?.rows || [];
-
-            if (rows.length === 0) {
-                errDiv.innerText = `Usuario "${username}" no encontrado.`;
-                errDiv.classList.remove('hidden');
-                return;
-            }
-
-            const dbPassword = rows[0][0]?.value || "";
-
-            if (dbPassword && dbPassword !== currentPwd) {
-                errDiv.innerText = "Contraseña actual incorrecta.";
-                errDiv.classList.remove('hidden');
-                return;
-            }
-
-            await tursoQuery([{
-                sql: "UPDATE users SET password = ? WHERE LOWER(username) = LOWER(?)",
-                args: [String(newPwd), String(username)]
-            }]);
-
-            successDiv.classList.remove('hidden');
-            setTimeout(() => {
-                closeChangePasswordModal();
-            }, 1200);
-
-        } catch (err) {
-            errDiv.innerText = "Error: " + err.message;
-            errDiv.classList.remove('hidden');
-        }
-    }
-
-    async function openDetailsModal(taskId) {
-        const task = globalTasks.find(t => t.id === taskId);
-        if(!task) return;
-
-        document.getElementById('details-activity-id').value = task.id;
-        document.getElementById('details-modal-title').innerText = task.title;
-        document.getElementById('details-modal-subtitle').innerText = `Process: ${task.station || 'N/A'} | Owner: ${task.assigned_to}`;
-
-        document.getElementById('details-modal').classList.remove('hidden');
-        document.getElementById('details-modal').classList.add('flex');
-
-        switchDetailsTab('attachments');
-        await loadDetails(task.id);
-    }
-
-    function closeDetailsModal() {
-        document.getElementById('details-modal').classList.add('hidden');
-        document.getElementById('details-modal').classList.remove('flex');
-    }
-
-    function switchDetailsTab(tab) {
-        const btnComments = document.getElementById('tab-btn-comments');
-        const btnAttachments = document.getElementById('tab-btn-attachments');
-        const tabComments = document.getElementById('tab-comments');
-        const tabAttachments = document.getElementById('tab-attachments');
-
-        if(tab === 'comments') {
-            btnComments.className = "pb-2 border-b-2 border-blue-500 text-blue-400 flex items-center gap-2 cursor-pointer font-bold";
-            btnAttachments.className = "pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 cursor-pointer font-bold";
-            tabComments.classList.remove('hidden');
-            tabAttachments.classList.add('hidden');
-        } else {
-            btnAttachments.className = "pb-2 border-b-2 border-amber-500 text-amber-400 flex items-center gap-2 cursor-pointer font-bold";
-            btnComments.className = "pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 cursor-pointer font-bold";
-            tabAttachments.classList.remove('hidden');
-            tabComments.classList.add('hidden');
-        }
-    }
-
-    async function loadDetails(activityId) {
-        try {
-            const res = await tursoQuery([{
-                sql: "SELECT id, type, content, created_at, author, file_name, file_type FROM activity_details WHERE activity_id = ? ORDER BY id DESC",
-                args: [Number(activityId)]
-            }]);
-
-            const rows = res[0]?.response?.result?.rows || [];
-            const commentsContainer = document.getElementById('comments-list');
-            const attachmentsContainer = document.getElementById('attachments-list');
-
-            commentsContainer.innerHTML = '';
-            attachmentsContainer.innerHTML = '';
-            loadedAttachmentsMap = {};
-
-            let commentsCount = 0;
-            let attachmentsCount = 0;
-
-            rows.forEach(r => {
-                const detailId = Number(r[0].value);
-                const type = r[1].value;
-                const content = r[2].value;
-                const date = r[3].value;
-                const author = r[4]?.value || 'Anónimo';
-                const fileName = r[5]?.value || 'Archivo Adjunto';
-                const fileType = r[6]?.value || '';
-
-                if(type === 'comment') {
-                    commentsCount++;
-                    commentsContainer.innerHTML += `
-                        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs">
-                            <div class="flex justify-between items-center text-[10px] text-slate-500 mb-1">
-                                <span class="font-bold text-blue-400 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-user-circle"></i> ${author}
-                                </span>
-                                <span>${date}</span>
-                            </div>
-                            <p class="text-slate-200 leading-relaxed">${content}</p>
-                        </div>`;
-                } else {
-                    attachmentsCount++;
-                    loadedAttachmentsMap[detailId] = {
-                        id: detailId,
-                        fileName: fileName,
-                        fileType: fileType,
-                        dataUrl: content
-                    };
-
-                    attachmentsContainer.innerHTML += `
-                        <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs flex justify-between items-center gap-3">
-                            <div class="truncate flex-1">
-                                <div class="text-[10px] text-slate-500 mb-0.5">
-                                    <i class="fa-solid fa-user-circle text-amber-400 mr-1"></i> Subido por: <strong class="text-slate-400">${author}</strong> • <span class="text-slate-600">${date}</span>
-                                </div>
-                                <div class="font-semibold text-slate-200 truncate flex items-center gap-2">
-                                    <i class="fa-solid fa-file-lines text-amber-500"></i> ${fileName}
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="openPreviewModal(${detailId})" class="bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 px-2.5 py-1.5 rounded-lg transition font-bold text-[11px] flex items-center gap-1">
-                                    <i class="fa-solid fa-eye"></i> Ver
-                                </button>
-                                <a href="${content}" download="${fileName}" class="bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-lg transition font-bold text-[11px] flex items-center gap-1">
-                                    <i class="fa-solid fa-download"></i> Descargar
-                                </a>
-                            </div>
-                        </div>`;
-                }
-            });
-
-            if(commentsCount === 0) commentsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No hay comentarios aún.</p>`;
-            if(attachmentsCount === 0) attachmentsContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No hay archivos Evidence anexados.</p>`;
-
-        } catch(e) {
-            console.error("Error al cargar detalles:", e);
-        }
-    }
-
-    function openPreviewModal(detailId) {
-        const item = loadedAttachmentsMap[detailId];
-        if (!item) return;
-
-        document.getElementById('preview-filename').innerText = item.fileName;
-        const dlBtn = document.getElementById('preview-download-btn');
-        dlBtn.href = item.dataUrl;
-        dlBtn.download = item.fileName;
-
-        const container = document.getElementById('preview-container');
-        container.innerHTML = '';
-
-        if (item.fileType.startsWith('image/')) {
-            container.innerHTML = `<img src="${item.dataUrl}" class="max-h-full max-w-full object-contain rounded-lg shadow-lg">`;
-        } else if (item.fileType === 'application/pdf') {
-            container.innerHTML = `<iframe src="${item.dataUrl}" class="w-full h-full border-0 rounded-lg"></iframe>`;
-        } else {
-            container.innerHTML = `
-                <div class="text-center p-8 max-w-sm">
-                    <i class="fa-solid fa-file-lines text-6xl text-slate-600 mb-4"></i>
-                    <p class="text-xs text-slate-400 mb-4">Previsualización en vivo no disponible para <strong>${item.fileType || 'Desconocido'}</strong>.</p>
-                    <a href="${item.dataUrl}" download="${item.fileName}" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition inline-flex items-center gap-2">
-                        <i class="fa-solid fa-download"></i> Descargar Archivo Directamente
-                    </a>
-                </div>
-            `;
-        }
-
-        document.getElementById('preview-modal').classList.remove('hidden');
-        document.getElementById('preview-modal').classList.add('flex');
-    }
-
-    function closePreviewModal() {
-        document.getElementById('preview-modal').classList.add('hidden');
-        document.getElementById('preview-modal').classList.remove('flex');
-        document.getElementById('preview-container').innerHTML = '';
-    }
-
-    async function addDetailItem(e, type) {
-        e.preventDefault();
-        const activityId = document.getElementById('details-activity-id').value;
-        const dateStr = new Date().toLocaleString();
-        const session = JSON.parse(localStorage.getItem('tracker_session'));
-        const authorName = session?.username || (currentRole === 'admin' ? 'Daniel' : 'Usuario');
-
-        if(type === 'comment') {
-            const input = document.getElementById('new-comment-text');
-            const content = input.value.trim();
-            if(!content) return;
-
+        async function initializeDatabaseSchema() {
             try {
-                await tursoQuery([{
-                    sql: "INSERT INTO activity_details (activity_id, type, content, created_at, author) VALUES (?, ?, ?, ?, ?)",
-                    args: [Number(activityId), 'comment', String(content), String(dateStr), String(authorName)]
-                }]);
-                input.value = '';
-                await loadDetails(activityId);
-            } catch(err) {
-                alert("Error al guardar comentario: " + err.message);
-            }
-        } else {
-            const fileInput = document.getElementById('new-attachment-file');
-            const file = fileInput.files[0];
-
-            if(!file) {
-                alert("Selecciona un archivo.");
-                return;
-            }
-
-            if (file.size > 3 * 1024 * 1024) {
-                alert("El archivo excede el límite permitido (Máximo 3 MB).");
-                return;
-            }
-
-            const btnUpload = document.getElementById('btn-upload-file');
-            btnUpload.disabled = true;
-            btnUpload.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
-
-            const reader = new FileReader();
-            reader.onload = async function(event) {
-                const base64Data = event.target.result;
-
-                try {
-                    await tursoQuery([{
-                        sql: "INSERT INTO activity_details (activity_id, type, content, created_at, author, file_name, file_type) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                        args: [Number(activityId), 'attachment', String(base64Data), String(dateStr), String(authorName), String(file.name), String(file.type)]
-                    }]);
-
-                    fileInput.value = '';
-                    await loadDetails(activityId);
-                    await loadTasks();
-                } catch(err) {
-                    alert("Error al guardar el archivo: " + err.message);
-                } finally {
-                    btnUpload.disabled = false;
-                    btnUpload.innerHTML = `<i class="fa-solid fa-upload"></i> Subir Evidence a Base de Datos`;
-                }
-            };
-
-            reader.readAsDataURL(file);
-        }
-    }
-
-    async function loadTasks() {
-        try {
-            let rows = [];
-            try {
-                const res = await tursoQuery(["SELECT id, title, assigned_to, start_date, end_date, progress, status, priority, station, action_taken FROM activities ORDER BY id DESC"]);
-                rows = res[0]?.response?.result?.rows || [];
-            } catch(err) {
-                await tursoQuery([
-                    `CREATE TABLE IF NOT EXISTS activities (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        title TEXT,
-                        assigned_to TEXT,
-                        start_date TEXT,
-                        end_date TEXT,
-                        progress INTEGER,
-                        status TEXT,
-                        priority TEXT,
-                        station TEXT,
-                        action_taken TEXT
-                    )`
-                ]);
-                const resRetry = await tursoQuery(["SELECT id, title, assigned_to, start_date, end_date, progress, status, priority, station, action_taken FROM activities ORDER BY id DESC"]);
-                rows = resRetry[0]?.response?.result?.rows || [];
-            }
-
-            globalTasks = rows.map(r => ({
-                id: Number(r[0].value),
-                title: r[1]?.value || '',
-                assigned_to: r[2]?.value || '',
-                start_date: r[3]?.value || '',
-                end_date: r[4]?.value || '',
-                progress: Number(r[5]?.value || 0),
-                status: r[6]?.value || 'Open',
-                priority: r[7]?.value || 'Media',
-                station: r[8]?.value || '',
-                action_taken: r[9]?.value || ''
-            }));
-
-            await loadEvidencesMap();
-            filterTasks();
-        } catch(e) {
-            console.error("Error al cargar actividades:", e);
-        }
-    }
-
-    async function loadEvidencesMap() {
-        try {
-            const res = await tursoQuery(["SELECT id, activity_id, content, file_name, file_type FROM activity_details WHERE type = 'attachment' ORDER BY id DESC"]);
-            const rows = res[0]?.response?.result?.rows || [];
-            
-            globalEvidencesMap = {};
-            rows.forEach(r => {
-                const actId = Number(r[1].value);
-                if (!globalEvidencesMap[actId]) {
-                    globalEvidencesMap[actId] = [];
-                }
-                globalEvidencesMap[actId].push({
-                    id: Number(r[0].value),
-                    dataUrl: r[2]?.value || '#',
-                    fileName: r[3]?.value || 'Evidence',
-                    fileType: r[4]?.value || ''
-                });
-            });
-        } catch(err) {
-            console.error("Error al mapear evidencias:", err);
-        }
-    }
-
-    function renderTasksTable(tasksList) {
-        const tbody = document.getElementById('tasks-table-body');
-        if(!tbody) return;
-        tbody.innerHTML = '';
-
-        if (tasksList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="10" class="text-center p-6 text-slate-500">No se encontraron actividades registradas.</td></tr>`;
-            return;
-        }
-
-        tasksList.forEach((t, index) => {
-            const evidenceItems = globalEvidencesMap[t.id] || [];
-            let evidenceCellHtml = `<span class="text-slate-600 text-[11px] italic">Sin evidencias</span>`;
-
-            if (evidenceItems.length > 0) {
-                evidenceCellHtml = `<div class="flex flex-col gap-1">`;
-                evidenceItems.forEach(item => {
-                    evidenceCellHtml += `
-                        <a href="${item.dataUrl}" download="${item.fileName}" title="Clic para descargar" class="text-blue-400 hover:text-blue-300 underline font-semibold text-[11px] flex items-center gap-1.5 truncate max-w-[150px]">
-                            <i class="fa-solid fa-paperclip text-amber-400 text-[10px]"></i> ${item.fileName}
-                        </a>`;
-                });
-                evidenceCellHtml += `</div>`;
-            }
-
-            tbody.innerHTML += `
-                <tr class="hover:bg-slate-800/30 border-b border-slate-800/60 text-xs">
-                    <td class="p-3.5 font-mono text-slate-400 font-bold">${index + 1}</td>
-                    <td class="p-3.5 font-medium text-slate-200 max-w-[220px]">${t.title}</td>
-                    <td class="p-3.5 text-indigo-300 font-medium">${t.station || '<span class="text-slate-600">N/A</span>'}</td>
-                    <td class="p-3.5 text-slate-300 font-semibold">${t.assigned_to}</td>
-                    <td class="p-3.5 text-slate-400 max-w-[200px] leading-tight">${t.action_taken || '<span class="text-slate-600 italic">Sin descripción</span>'}</td>
-                    <td class="p-3.5">${evidenceCellHtml}</td>
-                    <td class="p-3.5 text-slate-400 font-mono text-[11px]">${t.start_date}</td>
-                    <td class="p-3.5 text-slate-400 font-mono text-[11px]">${t.end_date}</td>
-                    <td class="p-3.5">
-                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold border ${getStatusBadgeClass(t.status)}">
-                            ${t.status}
-                        </span>
-                    </td>
-                    <td class="p-3.5 text-right space-x-2 whitespace-nowrap">
-                        <button onclick="openDetailsModal(${t.id})" title="Evidencias y comentarios" class="text-amber-400 hover:text-amber-300 transition px-1"><i class="fa-solid fa-folder-open"></i></button>
-                        <button onclick="editTask(${t.id})" title="Editar actividad" class="text-blue-400 hover:text-blue-300 transition px-1"><i class="fa-solid fa-pen"></i></button>
-                        <button onclick="deleteTask(${t.id})" title="Eliminar actividad" class="text-rose-400 hover:text-rose-300 transition px-1"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    function checkSavedSession() {
-        const savedSession = JSON.parse(localStorage.getItem('tracker_session'));
-        if (savedSession && savedSession.isLoggedIn) {
-            const roleSelector = document.getElementById('role-selector');
-            if (roleSelector) roleSelector.value = savedSession.role;
-            toggleRole(savedSession.role);
-            document.getElementById('login-screen').classList.add('hidden');
-        }
-    }
-
-    function handleLogin(e) {
-        e.preventDefault();
-        const user = document.getElementById('login-username').value.trim();
-        const pass = document.getElementById('login-password').value.trim();
-        const errDiv = document.getElementById('login-error');
-
-        if (user && pass) {
-            let role = 'user';
-            const roleSelector = document.getElementById('role-selector');
-            
-            if (user.toLowerCase().includes('daniel') || user.toLowerCase().includes('admin')) {
-                role = 'admin';
-            }
-
-            if (roleSelector) roleSelector.value = role;
-            toggleRole(role);
-
-            localStorage.setItem('tracker_session', JSON.stringify({
-                isLoggedIn: true,
-                username: user,
-                role: role
-            }));
-
-            errDiv.classList.add('hidden');
-            document.getElementById('login-screen').classList.add('hidden');
-        } else {
-            errDiv.classList.remove('hidden');
-        }
-    }
-
-    function logout() {
-        localStorage.removeItem('tracker_session');
-        document.getElementById('login-username').value = '';
-        document.getElementById('login-password').value = '';
-        document.getElementById('login-error').classList.add('hidden');
-        document.getElementById('login-screen').classList.remove('hidden');
-    }
-
-    function toggleFullScreenMenu() {
-        const menu = document.getElementById('fullscreen-menu');
-        menu.classList.toggle('hidden');
-        menu.classList.toggle('flex');
-    }
-
-    function toggleRole(role) {
-        currentRole = role;
-        const btnAddUser = document.getElementById('btn-add-user');
-        const adminNotice = document.getElementById('admin-notice');
-
-        if (role === 'admin') {
-            if (btnAddUser) {
-                btnAddUser.disabled = false;
-                btnAddUser.className = "bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-semibold transition cursor-pointer";
-            }
-            if (adminNotice) adminNotice.classList.add('hidden');
-        } else {
-            if (btnAddUser) {
-                btnAddUser.disabled = true;
-                btnAddUser.className = "bg-slate-800 text-slate-500 px-4 py-2 rounded-lg text-xs font-semibold cursor-not-allowed border border-slate-700";
-            }
-            if (adminNotice) adminNotice.classList.remove('hidden');
-        }
-        renderUsersTable();
-    }
-
-    async function loadUsers() {
-        try {
-            let rows = [];
-            try {
-                const res = await tursoQuery(["SELECT id, username FROM users ORDER BY username ASC"]);
-                rows = res[0]?.response?.result?.rows || [];
-            } catch(err) {
                 await tursoQuery([
                     `CREATE TABLE IF NOT EXISTS users (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        username TEXT,
+                        username TEXT UNIQUE NOT NULL,
                         password TEXT
-                    )`
+                    );`,
+                    `CREATE TABLE IF NOT EXISTS stations (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT UNIQUE NOT NULL
+                    );`,
+                    `CREATE TABLE IF NOT EXISTS activities (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title TEXT NOT NULL,
+                        assigned_to TEXT,
+                        start_date TEXT,
+                        end_date TEXT,
+                        progress INTEGER DEFAULT 0,
+                        status TEXT DEFAULT 'Open',
+                        priority TEXT DEFAULT 'Media',
+                        station TEXT,
+                        action_taken TEXT
+                    );`,
+                    `CREATE TABLE IF NOT EXISTS activity_details (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        activity_id INTEGER NOT NULL,
+                        type TEXT NOT NULL,
+                        content TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                        author TEXT,
+                        file_name TEXT,
+                        file_type TEXT,
+                        FOREIGN KEY (activity_id) REFERENCES activities(id) ON DELETE CASCADE
+                    );`
                 ]);
-                const resRetry = await tursoQuery(["SELECT id, username FROM users ORDER BY username ASC"]);
-                rows = resRetry[0]?.response?.result?.rows || [];
+            } catch (err) {
+                console.error("Error inicializando esquema:", err);
             }
-            
-            globalUsers = rows.map(r => ({ 
-                id: Number(r[0].value), 
-                username: r[1].value 
-            }));
+        }
 
+        async function loadAllData() {
+            try {
+                const [usersRes, stationsRes, activitiesRes] = await Promise.all([
+                    tursoQuery(["SELECT id, username, password FROM users ORDER BY username ASC;"]),
+                    tursoQuery(["SELECT id, name FROM stations ORDER BY name ASC;"]),
+                    tursoQuery(["SELECT id, title, assigned_to, start_date, end_date, progress, status, priority, station, action_taken FROM activities ORDER BY id DESC;"])
+                ]);
+
+                // Procesar Usuarios
+                globalUsers = [];
+                if (usersRes[0] && usersRes[0].rows) {
+                    const cols = usersRes[0].cols.map(c => c.name);
+                    globalUsers = usersRes[0].rows.map(row => {
+                        let obj = {};
+                        row.forEach((val, i) => obj[cols[i]] = val.value);
+                        return obj;
+                    });
+                }
+
+                if (globalUsers.length === 0) {
+                    await tursoQuery([
+                        { sql: "INSERT OR IGNORE INTO users (username, password) VALUES (?, ?);", args: ["Daniel", "1234"] },
+                        { sql: "INSERT OR IGNORE INTO users (username, password) VALUES (?, ?);", args: ["Ingeniería", "1234"] }
+                    ]);
+                    globalUsers = [{ id: 1, username: "Daniel" }, { id: 2, username: "Ingeniería" }];
+                }
+
+                // Procesar Estaciones
+                globalStations = [];
+                if (stationsRes[0] && stationsRes[0].rows) {
+                    const cols = stationsRes[0].cols.map(c => c.name);
+                    globalStations = stationsRes[0].rows.map(row => {
+                        let obj = {};
+                        row.forEach((val, i) => obj[cols[i]] = val.value);
+                        return obj;
+                    });
+                }
+
+                if (globalStations.length === 0) {
+                    const defaultStations = ["SMT Line 1", "SMT Line 2", "PTH Assembly", "Testing / ICT", "Quality / Quality Control", "Packaging & Warehouse"];
+                    const stm = defaultStations.map(st => ({ sql: "INSERT OR IGNORE INTO stations (name) VALUES (?);", args: [st] }));
+                    await tursoQuery(stm);
+                    globalStations = defaultStations.map((st, idx) => ({ id: idx + 1, name: st }));
+                }
+
+                // Procesar Actividades
+                globalTasks = [];
+                if (activitiesRes[0] && activitiesRes[0].rows) {
+                    const cols = activitiesRes[0].cols.map(c => c.name);
+                    globalTasks = activitiesRes[0].rows.map(row => {
+                        let obj = {};
+                        row.forEach((val, i) => obj[cols[i]] = val.value);
+                        obj.id = Number(obj.id);
+                        obj.progress = Number(obj.progress || 0);
+                        obj.action_taken = obj.action_taken || obj.description || '';
+                        return obj;
+                    });
+                }
+
+                populateUserDropdowns();
+                populateStationDropdowns();
+                renderAllViews();
+            } catch (err) {
+                console.error("Error al cargar datos remotos:", err);
+            }
+        }
+
+        function populateUserDropdowns() {
             const filterSelect = document.getElementById('filter-user');
             const taskSelect = document.getElementById('task-assigned');
+            
+            const currentFilter = filterSelect.value;
+            const currentTaskUser = taskSelect.value;
 
-            if(filterSelect) filterSelect.innerHTML = '<option value="">Todos los Owners</option>';
-            if(taskSelect) taskSelect.innerHTML = '<option value="">Selecciona Owner (Name)...</option>';
+            filterSelect.innerHTML = '<option value="">Todos los Responsables</option>';
+            taskSelect.innerHTML = '<option value="">Seleccionar...</option>';
 
             globalUsers.forEach(u => {
-                if (u.username) {
-                    if(filterSelect) filterSelect.innerHTML += `<option value="${u.username}">${u.username}</option>`;
-                    if(taskSelect) taskSelect.innerHTML += `<option value="${u.username}">${u.username}</option>`;
+                const opt1 = document.createElement('option');
+                opt1.value = u.username;
+                opt1.textContent = u.username;
+                filterSelect.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = u.username;
+                opt2.textContent = u.username;
+                taskSelect.appendChild(opt2);
+            });
+
+            filterSelect.value = currentFilter;
+            taskSelect.value = currentTaskUser;
+        }
+
+        function populateStationDropdowns() {
+            const taskStation = document.getElementById('task-station');
+            const current = taskStation.value;
+            taskStation.innerHTML = '<option value="">Seleccionar Estación...</option>';
+
+            globalStations.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.name;
+                opt.textContent = s.name;
+                taskStation.appendChild(opt);
+            });
+
+            taskStation.value = current;
+        }
+
+        function renderAllViews() {
+            renderTasksTable();
+            renderUsersTable();
+            renderStationsTable();
+            renderGanttChart();
+            renderKPIs();
+            renderCharts();
+        }
+
+        function renderTasksTable() {
+            const tbody = document.getElementById('tasks-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = getFilteredTasks();
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center p-6 text-slate-500 text-xs">No hay actividades registradas o que coincidan con los filtros.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach((t, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition border-b border-slate-800/40";
+
+                let statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">Open</span>`;
+                if (t.status === 'In Progress' || t.status === 'En Proceso') {
+                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">In Progress</span>`;
+                } else if (t.status === 'Closed' || t.status === 'Completado' || t.progress === 100) {
+                    statusBadge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Closed</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td class="p-3.5 text-slate-400 font-mono">${idx + 1}</td>
+                    <td class="p-3.5 font-bold text-white">${t.title}</td>
+                    <td class="p-3.5 text-slate-300">${t.station || '-'}</td>
+                    <td class="p-3.5 text-indigo-300 font-semibold">${t.assigned_to || 'Sin Asignar'}</td>
+                    <td class="p-3.5 text-slate-400 truncate max-w-xs">${t.action_taken || '-'}</td>
+                    <td class="p-3.5">
+                        <button onclick="openDetailsModal(${t.id})" class="bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 px-2.5 py-1 rounded text-[11px] font-bold transition flex items-center gap-1">
+                            <i class="fa-solid fa-paperclip"></i> Evidencia / Notas
+                        </button>
+                    </td>
+                    <td class="p-3.5 text-slate-300">${t.start_date || '-'}</td>
+                    <td class="p-3.5 text-slate-300">${t.end_date || '-'}</td>
+                    <td class="p-3.5">${statusBadge}</td>
+                    <td class="p-3.5 text-right space-x-1">
+                        <button onclick="openTaskModal(${t.id})" title="Editar" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-blue-400 rounded transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteTask(${t.id})" title="Eliminar" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-rose-400 rounded transition"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function getFilteredTasks() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const priority = document.getElementById('filter-priority').value;
+            const status = document.getElementById('filter-status').value;
+            const user = document.getElementById('filter-user').value;
+
+            return globalTasks.filter(t => {
+                const matchSearch = (t.title || '').toLowerCase().includes(search) || (t.action_taken || '').toLowerCase().includes(search);
+                const matchPriority = !priority || t.priority === priority;
+                
+                const currentSt = t.status || '';
+                const matchStatus = !status || 
+                    (status === 'Pendiente' && (currentSt === 'Open' || currentSt === 'Pendiente')) ||
+                    (status === 'En Proceso' && (currentSt === 'In Progress' || currentSt === 'En Proceso')) ||
+                    (status === 'Completado' && (currentSt === 'Closed' || currentSt === 'Completado'));
+                    
+                const matchUser = !user || t.assigned_to === user;
+
+                return matchSearch && matchPriority && matchStatus && matchUser;
+            });
+        }
+
+        function filterTasks() {
+            renderTasksTable();
+            renderGanttChart();
+        }
+
+        function renderUsersTable() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = '';
+
+            if (globalUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center p-6 text-slate-500 text-xs">No hay usuarios registrados.</td></tr>`;
+                return;
+            }
+
+            globalUsers.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition border-b border-slate-800/40";
+
+                tr.innerHTML = `
+                    <td class="p-3.5 text-slate-400 font-mono">${u.id}</td>
+                    <td class="p-3.5 font-bold text-white">${u.username}</td>
+                    <td class="p-3.5 text-right">
+                        ${currentRole === 'admin' ? `
+                            <button onclick="deleteUser(${u.id})" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-rose-400 rounded transition"><i class="fa-solid fa-trash"></i></button>
+                        ` : `<span class="text-slate-600 text-[11px]">Lectura</span>`}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderStationsTable() {
+            const tbody = document.getElementById('stations-table-body');
+            tbody.innerHTML = '';
+
+            globalStations.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition border-b border-slate-800/40";
+                tr.innerHTML = `
+                    <td class="p-3 text-slate-400 font-mono">${s.id}</td>
+                    <td class="p-3 font-semibold text-white">${s.name}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="deleteStation(${s.id})" class="p-1 bg-slate-800 hover:bg-slate-700 text-rose-400 rounded transition"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderKPIs() {
+            const total = globalTasks.length;
+            const completed = globalTasks.filter(t => t.status === 'Closed' || t.status === 'Completado' || t.progress === 100).length;
+            
+            const now = new Date();
+            const threeDaysOut = new Date();
+            threeDaysOut.setDate(now.getDate() + 3);
+
+            const dueSoon = globalTasks.filter(t => {
+                if (t.status === 'Closed' || t.status === 'Completado' || t.progress === 100 || !t.start_date) return false;
+                const d = new Date(t.start_date);
+                return d <= threeDaysOut;
+            }).length;
+
+            const activeUsers = new Set(globalTasks.map(t => t.assigned_to).filter(Boolean)).size;
+
+            document.getElementById('metric-total').textContent = total;
+            document.getElementById('metric-due-soon').textContent = dueSoon;
+            document.getElementById('metric-completed').textContent = completed;
+            document.getElementById('metric-active-users').textContent = activeUsers;
+
+            const overdueAlert = document.getElementById('overdue-alert');
+            if (dueSoon > 0) {
+                overdueAlert.classList.remove('hidden');
+                document.getElementById('alert-title').textContent = `¡Atención! Hay ${dueSoon} tarea(s) pendientes o próximas a vencer`;
+            } else {
+                overdueAlert.classList.add('hidden');
+            }
+        }
+
+        function renderCharts() {
+            if (statusChartInstance) statusChartInstance.destroy();
+            if (barChartInstance) barChartInstance.destroy();
+
+            const userMap = {};
+            globalTasks.forEach(t => {
+                const u = t.assigned_to || 'Sin Asignar';
+                if (!userMap[u]) {
+                    userMap[u] = { 'Open': 0, 'In Progress': 0, 'Closed': 0 };
+                }
+                let st = 'Open';
+                if (t.status === 'Closed' || t.status === 'Completado' || t.progress === 100) st = 'Closed';
+                else if (t.status === 'In Progress' || t.status === 'En Proceso') st = 'In Progress';
+                
+                userMap[u][st]++;
+            });
+
+            const userLabels = Object.keys(userMap);
+            const openData = userLabels.map(u => userMap[u]['Open']);
+            const inProgData = userLabels.map(u => userMap[u]['In Progress']);
+            const closedData = userLabels.map(u => userMap[u]['Closed']);
+
+            const userCtx = document.getElementById('userBarChart').getContext('2d');
+            barChartInstance = new Chart(userCtx, {
+                type: 'bar',
+                data: {
+                    labels: userLabels,
+                    datasets: [
+                        {
+                            label: 'Open',
+                            data: openData,
+                            backgroundColor: '#e11d48'
+                        },
+                        {
+                            label: 'In Progress',
+                            data: inProgData,
+                            backgroundColor: '#f59e0b'
+                        },
+                        {
+                            label: 'Closed',
+                            data: closedData,
+                            backgroundColor: '#10b981'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: {
+                                color: '#cbd5e1',
+                                font: { size: 10 },
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: { display: false }
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: {
+                                color: '#94a3b8',
+                                stepSize: 4
+                            },
+                            grid: { color: '#1e293b' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { color: '#cbd5e1', font: { size: 11 }, usePointStyle: false, boxWidth: 20 }
+                        },
+                        datalabels: {
+                            color: '#ffffff',
+                            font: { weight: 'bold', size: 11 },
+                            formatter: (value) => value > 0 ? value : ''
+                        }
+                    }
                 }
             });
 
-            renderUsersTable();
-        } catch(e) {
-            console.error("Error al cargar usuarios:", e);
-        }
-    }
+            let openCount = 0, inProgCount = 0, closedCount = 0;
+            globalTasks.forEach(t => {
+                if (t.status === 'Closed' || t.status === 'Completado' || t.progress === 100) closedCount++;
+                else if (t.status === 'In Progress' || t.status === 'En Proceso') inProgCount++;
+                else openCount++;
+            });
 
-    function renderUsersTable() {
-        const tbody = document.getElementById('users-table-body');
-        if(!tbody) return;
-        tbody.innerHTML = '';
-
-        if (globalUsers.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-slate-500">No hay usuarios registrados.</td></tr>`;
-            return;
-        }
-
-        globalUsers.forEach(u => {
-            const deleteBtn = currentRole === 'admin' 
-                ? `<button onclick="deleteUser(${u.id})" class="text-rose-400 hover:text-rose-300 transition"><i class="fa-solid fa-trash"></i></button>`
-                : `<span class="text-slate-600 text-xs"><i class="fa-solid fa-lock"></i> Bloqueado</span>`;
-
-            tbody.innerHTML += `
-                <tr class="hover:bg-slate-800/40 border-b border-slate-800/60">
-                    <td class="p-3.5 font-mono text-slate-500">#${u.id}</td>
-                    <td class="p-3.5 font-semibold text-white">${u.username}</td>
-                    <td class="p-3.5 text-right">${deleteBtn}</td>
-                </tr>
-            `;
-        });
-    }
-
-    function openUserModal() {
-        document.getElementById('user-modal').classList.remove('hidden');
-        document.getElementById('user-modal').classList.add('flex');
-    }
-
-    function closeUserModal() {
-        document.getElementById('user-modal').classList.add('hidden');
-        document.getElementById('user-modal').classList.remove('flex');
-    }
-
-    async function saveUser(e) {
-        e.preventDefault();
-        if (currentRole !== 'admin') return;
-
-        const usernameInput = document.getElementById('new-username');
-        const passwordInput = document.getElementById('new-password');
-        const username = usernameInput.value.trim();
-        const password = passwordInput.value.trim() || "123456";
-
-        if (!username) return;
-
-        try {
-            await tursoQuery([{
-                sql: "INSERT INTO users (username, password) VALUES (?, ?)",
-                args: [String(username), String(password)]
-            }]);
-            usernameInput.value = '';
-            passwordInput.value = '';
-            closeUserModal();
-            await loadUsers();
-        } catch (err) {
-            alert("Error al guardar usuario: " + err.message);
-        }
-    }
-
-    async function deleteUser(id) {
-        if (currentRole !== 'admin') return;
-        if (!confirm("¿Desea eliminar este usuario?")) return;
-
-        try {
-            await tursoQuery([{
-                sql: "DELETE FROM users WHERE id = ?",
-                args: [Number(id)]
-            }]);
-            await loadUsers();
-        } catch(e) {
-            alert("Error al eliminar usuario.");
-        }
-    }
-
-    function filterTasks() {
-        const search = document.getElementById('search-input')?.value.toLowerCase() || '';
-        const userFilter = document.getElementById('filter-user')?.value || '';
-        const statusFilter = document.getElementById('filter-status')?.value || '';
-        const priorityFilter = document.getElementById('filter-priority')?.value || '';
-
-        const filtered = globalTasks.filter(t => {
-            const matchesSearch = t.title.toLowerCase().includes(search) || (t.action_taken && t.action_taken.toLowerCase().includes(search));
-            const matchesUser = userFilter === '' || t.assigned_to === userFilter;
-            const matchesStatus = statusFilter === '' || t.status === statusFilter;
-            const matchesPriority = priorityFilter === '' || t.priority === priorityFilter;
-            return matchesSearch && matchesUser && matchesStatus && matchesPriority;
-        });
-
-        renderTasksTable(filtered);
-        renderMetricsAndCharts(filtered);
-        renderGantt(filtered);
-    }
-
-    function openTaskModal() {
-        document.getElementById('task-form').reset();
-        document.getElementById('task-id').value = '';
-        document.getElementById('modal-title').innerText = 'Nueva Actividad Gemba';
-        document.getElementById('task-modal').classList.remove('hidden');
-        document.getElementById('task-modal').classList.add('flex');
-    }
-
-    function closeTaskModal() {
-        document.getElementById('task-modal').classList.add('hidden');
-        document.getElementById('task-modal').classList.remove('flex');
-    }
-
-    function editTask(id) {
-        const t = globalTasks.find(item => item.id === id);
-        if(!t) return;
-
-        openTaskModal();
-        document.getElementById('modal-title').innerText = 'Editar Actividad Gemba';
-        document.getElementById('task-id').value = t.id;
-        document.getElementById('task-title').value = t.title;
-        document.getElementById('task-action-taken').value = t.action_taken || '';
-        document.getElementById('task-station').value = t.station || '';
-        document.getElementById('task-assigned').value = t.assigned_to;
-        document.getElementById('task-priority').value = t.priority || 'Media';
-        document.getElementById('task-start').value = t.start_date;
-        document.getElementById('task-end').value = t.end_date;
-        document.getElementById('task-progress').value = t.progress;
-        document.getElementById('task-status').value = t.status || 'Open';
-    }
-
-    async function saveTask(e) {
-        e.preventDefault();
-        const id = document.getElementById('task-id').value;
-        const title = document.getElementById('task-title').value.trim();
-        const action_taken = document.getElementById('task-action-taken').value.trim();
-        const station = document.getElementById('task-station').value;
-        const priority = document.getElementById('task-priority').value; 
-        const assigned = document.getElementById('task-assigned').value;
-        const start = document.getElementById('task-start').value;
-        const end = document.getElementById('task-end').value;
-        const progress = Number(document.getElementById('task-progress').value || 0);
-        const status = document.getElementById('task-status').value;
-
-        if (!assigned || !station) {
-            alert("Selecciona un Owner y un Process (estación).");
-            return;
-        }
-
-        try {
-            if (id) {
-                await tursoQuery([{
-                    sql: "UPDATE activities SET title = ?, station = ?, assigned_to = ?, start_date = ?, end_date = ?, progress = ?, status = ?, priority = ?, action_taken = ? WHERE id = ?",
-                    args: [title, station, assigned, start, end, progress, status, priority, action_taken, Number(id)]
-                }]);
-            } else {
-                await tursoQuery([{
-                    sql: "INSERT INTO activities (title, station, assigned_to, start_date, end_date, progress, status, priority, action_taken) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    args: [title, station, assigned, start, end, progress, status, priority, action_taken]
-                }]);
-            }
-
-            closeTaskModal();
-            await loadTasks();
-        } catch (err) {
-            alert("Error al guardar la tarea: " + err.message);
-        }
-    }
-
-    async function deleteTask(id) {
-        if (!confirm("¿Desea eliminar esta tarea?")) return;
-        try {
-            await tursoQuery([{
-                sql: "DELETE FROM activities WHERE id = ?",
-                args: [Number(id)]
-            }]);
-            await loadTasks();
-        } catch (err) {
-            alert("Error al eliminar la tarea.");
-        }
-    }
-
-    function getStatusBadgeClass(status) {
-        switch(status) {
-            case 'Closed': case 'Completado': case 'Finalizada': return 'bg-emerald-950/60 border-emerald-800/80 text-emerald-400';
-            case 'In Progress': case 'En Proceso': return 'bg-amber-950/60 border-amber-800/80 text-amber-400';
-            case 'Open': case 'Pendiente': default: return 'bg-rose-950/60 border-rose-800/80 text-rose-400';
-        }
-    }
-
-    function renderGantt(tasksList) {
-        const container = document.getElementById('gantt-chart-container');
-        if(!container) return;
-        if (!tasksList || tasksList.length === 0) {
-            container.innerHTML = `<p class="text-slate-500 text-xs text-center py-6">Sin actividades filtradas para el Gantt.</p>`;
-            return;
-        }
-
-        let minTimestamp = Infinity;
-        let maxTimestamp = -Infinity;
-
-        tasksList.forEach(t => {
-            const s = new Date(t.start_date).getTime();
-            const e = new Date(t.end_date).getTime();
-            if (!isNaN(s) && s < minTimestamp) minTimestamp = s;
-            if (!isNaN(e) && e > maxTimestamp) maxTimestamp = e;
-        });
-
-        if (minTimestamp === Infinity || maxTimestamp === -Infinity || minTimestamp === maxTimestamp) {
-            maxTimestamp = minTimestamp + (86400000 * 7);
-        }
-
-        const totalDuration = maxTimestamp - minTimestamp || 1;
-        let html = `<div class="space-y-3 py-2">`;
-
-        tasksList.forEach(t => {
-            const start = new Date(t.start_date).getTime();
-            const end = new Date(t.end_date).getTime();
-            
-            let leftPercent = 0;
-            let widthPercent = 100;
-
-            if (!isNaN(start) && !isNaN(end)) {
-                leftPercent = Math.max(0, ((start - minTimestamp) / totalDuration) * 100);
-                widthPercent = Math.max(5, (((end - start) || 86400000) / totalDuration) * 100);
-            }
-
-            let barColor = 'bg-rose-600';
-            if (t.status === 'Closed' || t.status === 'Completado') barColor = 'bg-emerald-500';
-            else if (t.status === 'In Progress' || t.status === 'En Proceso') barColor = 'bg-amber-500';
-
-            html += `
-                <div>
-                    <div class="flex justify-between text-xs text-slate-400 mb-1 font-medium">
-                        <span class="text-white font-semibold truncate max-w-[220px]">${t.title} <span class="text-indigo-400">[${t.station || 'N/A'}]</span></span>
-                        <span class="text-slate-500 font-mono text-[10px]">${t.start_date} → ${t.end_date}</span>
-                    </div>
-                    <div class="w-full bg-slate-900 rounded-lg h-5 relative overflow-hidden border border-slate-800">
-                        <div class="${barColor} h-full rounded transition-all duration-300 relative flex items-center justify-end px-2" 
-                             style="margin-left: ${leftPercent}%; width: ${widthPercent}%;">
-                            <span class="text-[10px] font-bold text-slate-950 drop-shadow-sm">${t.progress}%</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-
-        html += `</div>`;
-        container.innerHTML = html;
-    }
-
-    function renderMetricsAndCharts(tasksList) {
-        const total = tasksList.length;
-        const completed = tasksList.filter(t => t.status === 'Closed' || t.status === 'Completado' || t.status === 'Finalizada').length;
-        
-        const today = new Date();
-        const dueSoon = tasksList.filter(t => {
-            if (t.status === 'Closed' || t.status === 'Completado' || t.status === 'Finalizada') return false;
-            const endDate = new Date(t.end_date);
-            const diffTime = endDate - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays <= 3;
-        }).length;
-
-        const uniqueUsers = new Set(tasksList.map(t => t.assigned_to).filter(Boolean)).size;
-
-        if(document.getElementById('metric-total')) document.getElementById('metric-total').innerText = total;
-        if(document.getElementById('metric-due-soon')) document.getElementById('metric-due-soon').innerText = dueSoon;
-        if(document.getElementById('metric-completed')) document.getElementById('metric-completed').innerText = completed;
-        if(document.getElementById('metric-active-users')) document.getElementById('metric-active-users').innerText = uniqueUsers;
-
-        const alertBanner = document.getElementById('overdue-alert');
-        if (alertBanner) {
-            if (dueSoon > 0) {
-                alertBanner.classList.remove('hidden');
-                document.getElementById('alert-title').innerText = `¡Atención! Hay ${dueSoon} tarea(s) próxima(s) a vencer o vencida(s)`;
-            } else {
-                alertBanner.classList.add('hidden');
-            }
-        }
-
-        renderCharts(tasksList);
-    }
-
-    function renderCharts(tasksList) {
-        const chartCanvas = document.getElementById('statusChart');
-        if(!chartCanvas) return;
-        const ctxDoughnut = chartCanvas.getContext('2d');
-        const pending = tasksList.filter(t => t.status === 'Open' || t.status === 'Pendiente').length;
-        const inProgress = tasksList.filter(t => t.status === 'In Progress' || t.status === 'En Proceso').length;
-        const completed = tasksList.filter(t => t.status === 'Closed' || t.status === 'Completado' || t.status === 'Finalizada').length;
-
-        if (statusChartInstance) statusChartInstance.destroy();
-
-        statusChartInstance = new Chart(ctxDoughnut, {
-            type: 'doughnut',
-            data: {
-                labels: ['Open', 'In Progress', 'Closed'],
-                datasets: [{
-                    data: [pending, inProgress, completed],
-                    backgroundColor: ['#e11d48', '#f59e0b', '#10b981'],
-                    borderWidth: 3,
-                    borderColor: '#0f172a'
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: { color: '#94a3b8', font: { size: 11, weight: '600' } }
-                    },
-                    datalabels: {
-                        color: '#ffffff',
-                        font: { weight: 'bold', size: 12 },
-                        formatter: (value, ctx) => {
-                            const dataset = ctx.chart.data.datasets[0];
-                            const total = dataset.data.reduce((acc, curr) => acc + curr, 0);
-                            if (total === 0 || value === 0) return '';
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            return `${percentage % 1 === 0 ? Math.round(percentage) : percentage}%`;
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            statusChartInstance = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Open', 'In Progress', 'Closed'],
+                    datasets: [{
+                        data: [openCount, inProgCount, closedCount],
+                        backgroundColor: ['#e11d48', '#f59e0b', '#10b981'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: { color: '#cbd5e1', font: { size: 11 }, boxWidth: 20 }
+                        },
+                        datalabels: {
+                            color: '#ffffff',
+                            font: { weight: 'bold', size: 12 },
+                            formatter: (value, ctx) => {
+                                let sum = 0;
+                                let dataArr = ctx.chart.data.datasets[0].data;
+                                dataArr.map(data => { sum += data; });
+                                if (sum === 0 || value === 0) return '';
+                                let percentage = (value * 100 / sum).toFixed(1) + "%";
+                                return percentage;
+                            }
                         }
                     }
-                },
-                cutout: '70%'
+                }
+            });
+        }
+
+        function renderGanttChart() {
+            const container = document.getElementById('gantt-chart-container');
+            const tasks = getFilteredTasks();
+
+            if (tasks.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-xs text-slate-500">Sin datos para la vista Gantt</div>`;
+                return;
             }
-        });
 
-        const ctxBar = document.getElementById('userBarChart').getContext('2d');
-        const userLabels = Array.from(new Set(tasksList.map(t => t.assigned_to).filter(Boolean)));
+            let html = `<div class="space-y-3">`;
+            tasks.forEach(t => {
+                const progress = t.progress || 0;
+                html += `
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="font-bold text-white">${t.title} <span class="text-slate-400 font-normal">(${t.assigned_to || 'N/A'})</span></span>
+                            <span class="text-slate-400 font-mono">${progress}%</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700">
+                            <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
 
-        const pendingData = userLabels.map(u => tasksList.filter(t => t.assigned_to === u && (t.status === 'Open' || t.status === 'Pendiente')).length);
-        const inProgressData = userLabels.map(u => tasksList.filter(t => t.assigned_to === u && (t.status === 'In Progress' || t.status === 'En Proceso')).length);
-        const completedData = userLabels.map(u => tasksList.filter(t => t.assigned_to === u && (t.status === 'Closed' || t.status === 'Completado' || t.status === 'Finalizada')).length);
+        async function saveTask(e) {
+            e.preventDefault();
+            const id = document.getElementById('task-id').value;
+            const title = document.getElementById('task-title').value;
+            const action_taken = document.getElementById('task-action-taken').value;
+            const station = document.getElementById('task-station').value;
+            const assigned_to = document.getElementById('task-assigned').value;
+            const priority = document.getElementById('task-priority').value;
+            const start_date = document.getElementById('task-start').value;
+            const end_date = document.getElementById('task-end').value;
+            let progress = parseInt(document.getElementById('task-progress').value) || 0;
+            let status = document.getElementById('task-status').value;
 
-        if (barChartInstance) barChartInstance.destroy();
+            if (progress >= 100) status = 'Closed';
 
-        barChartInstance = new Chart(ctxBar, {
-            type: 'bar',
-            data: {
-                labels: userLabels.length ? userLabels : ['Sin datos'],
-                datasets: [
-                    { label: 'Open', data: userLabels.length ? pendingData : [0], backgroundColor: '#e11d48', borderRadius: 4 },
-                    { label: 'In Progress', data: userLabels.length ? inProgressData : [0], backgroundColor: '#f59e0b', borderRadius: 4 },
-                    { label: 'Closed', data: userLabels.length ? completedData : [0], backgroundColor: '#10b981', borderRadius: 4 }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: { stacked: true, ticks: { color: '#94a3b8', font: { size: 10 } }, grid: { display: false } },
-                    y: { stacked: true, ticks: { color: '#94a3b8', font: { size: 10 }, stepSize: 1 }, grid: { color: '#1e293b' } }
-                },
-                plugins: { 
-                    legend: { display: true, position: 'top', labels: { color: '#94a3b8', font: { size: 10, weight: '600' } } },
-                    datalabels: {
-                        color: '#ffffff',
-                        font: { weight: 'bold', size: 11 },
-                        formatter: (value) => value > 0 ? value : ''
-                    }
+            closeTaskModal();
+
+            if (id) {
+                const task = globalTasks.find(t => t.id == id);
+                if (task) {
+                    Object.assign(task, { title, action_taken, station, assigned_to, priority, start_date, end_date, progress, status });
+                }
+                renderAllViews();
+
+                await tursoQuery([{
+                    sql: `UPDATE activities SET title=?, action_taken=?, station=?, assigned_to=?, priority=?, start_date=?, end_date=?, progress=?, status=? WHERE id=?;`,
+                    args: [title, action_taken, station, assigned_to, priority, start_date, end_date, progress, status, Number(id)]
+                }]);
+            } else {
+                const tempId = Date.now();
+                const newTask = { id: tempId, title, action_taken, station, assigned_to, priority, start_date, end_date, progress, status };
+                globalTasks.unshift(newTask);
+                renderAllViews();
+
+                const res = await tursoQuery([{
+                    sql: `INSERT INTO activities (title, action_taken, station, assigned_to, priority, start_date, end_date, progress, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                    args: [title, action_taken, station, assigned_to, priority, start_date, end_date, progress, status]
+                }]);
+                
+                if (res[0] && res[0].last_insert_rowid) {
+                    newTask.id = Number(res[0].last_insert_rowid);
                 }
             }
-        });
-    }
-
-    function switchTab(tab) {
-        const btnAct = document.getElementById('nav-actividades');
-        const btnUsers = document.getElementById('nav-usuarios');
-
-        const viewAct = document.getElementById('view-activities');
-        const viewUsers = document.getElementById('view-users');
-
-        const activeClass = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 transition flex items-center gap-2';
-        const inactiveClass = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2 border border-transparent';
-
-        if(tab === 'activities') {
-            btnAct.className = activeClass;
-            btnUsers.className = inactiveClass;
-
-            viewAct.classList.remove('hidden');
-            viewUsers.classList.add('hidden');
-        } else if(tab === 'users') {
-            btnAct.className = inactiveClass;
-            btnUsers.className = activeClass;
-
-            viewAct.classList.add('hidden');
-            viewUsers.classList.remove('hidden');
         }
-    }
+
+        async function deleteTask(id) {
+            if (!confirm("¿Deseas eliminar esta actividad?")) return;
+            globalTasks = globalTasks.filter(t => t.id !== id);
+            renderAllViews();
+            await tursoQuery([{ sql: "DELETE FROM activities WHERE id=?;", args: [id] }]);
+        }
+
+        async function saveUser(e) {
+            e.preventDefault();
+            const username = document.getElementById('new-username').value;
+            const password = document.getElementById('new-password').value || '1234';
+
+            closeUserModal();
+
+            const tempUser = { id: Date.now(), username };
+            globalUsers.push(tempUser);
+            populateUserDropdowns();
+            renderUsersTable();
+
+            const res = await tursoQuery([{
+                sql: "INSERT INTO users (username, password) VALUES (?, ?);",
+                args: [username, password]
+            }]);
+
+            if (res[0] && res[0].last_insert_rowid) {
+                tempUser.id = Number(res[0].last_insert_rowid);
+                renderUsersTable();
+            }
+        }
+
+        async function deleteUser(id) {
+            if (!confirm("¿Eliminar usuario?")) return;
+            globalUsers = globalUsers.filter(u => u.id !== id);
+            populateUserDropdowns();
+            renderUsersTable();
+            await tursoQuery([{ sql: "DELETE FROM users WHERE id=?;", args: [id] }]);
+        }
+
+        async function saveStation(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-station-name').value;
+            document.getElementById('new-station-name').value = '';
+
+            const tempStation = { id: Date.now(), name };
+            globalStations.push(tempStation);
+            populateStationDropdowns();
+            renderStationsTable();
+
+            const res = await tursoQuery([{
+                sql: "INSERT INTO stations (name) VALUES (?);",
+                args: [name]
+            }]);
+
+            if (res[0] && res[0].last_insert_rowid) {
+                tempStation.id = Number(res[0].last_insert_rowid);
+                renderStationsTable();
+            }
+        }
+
+        async function deleteStation(id) {
+            if (!confirm("¿Eliminar estación?")) return;
+            globalStations = globalStations.filter(s => s.id !== id);
+            populateStationDropdowns();
+            renderStationsTable();
+            await tursoQuery([{ sql: "DELETE FROM stations WHERE id=?;", args: [id] }]);
+        }
+
+        async function openDetailsModal(activityId) {
+            document.getElementById('details-activity-id').value = activityId;
+            const task = globalTasks.find(t => t.id === activityId);
+            document.getElementById('details-modal-title').textContent = task ? task.title : 'Detalles de Actividad';
+            document.getElementById('details-modal-subtitle').textContent = `ID: #${activityId} • Responsable: ${task?.assigned_to || 'N/A'}`;
+            
+            document.getElementById('details-modal').classList.remove('hidden');
+            document.getElementById('details-modal').classList.add('flex');
+
+            loadActivityDetails(activityId);
+        }
+
+        async function loadActivityDetails(activityId) {
+            const listAttach = document.getElementById('attachments-list');
+            const listComments = document.getElementById('comments-list');
+            listAttach.innerHTML = '<div class="text-xs text-slate-500">Cargando datos...</div>';
+            listComments.innerHTML = '<div class="text-xs text-slate-500">Cargando comentarios...</div>';
+
+            const res = await tursoQuery([{
+                sql: "SELECT id, type, content, author, file_name, file_type, created_at FROM activity_details WHERE activity_id=? ORDER BY id DESC;",
+                args: [activityId]
+            }]);
+
+            listAttach.innerHTML = '';
+            listComments.innerHTML = '';
+
+            if (res[0] && res[0].rows) {
+                const cols = res[0].cols.map(c => c.name);
+                const items = res[0].rows.map(row => {
+                    let obj = {};
+                    row.forEach((val, i) => obj[cols[i]] = val.value);
+                    return obj;
+                });
+
+                items.forEach(item => {
+                    if (item.type === 'comment') {
+                        const div = document.createElement('div');
+                        div.className = "bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs";
+                        div.innerHTML = `
+                            <div class="flex justify-between font-bold text-slate-400 mb-1">
+                                <span>${item.author || 'Anónimo'}</span>
+                                <span class="text-[10px] text-slate-600">${item.created_at || ''}</span>
+                            </div>
+                            <p class="text-slate-200">${item.content}</p>
+                        `;
+                        listComments.appendChild(div);
+                    } else if (item.type === 'attachment') {
+                        const filename = item.file_name || 'Archivo';
+                        const div = document.createElement('div');
+                        div.className = "bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs flex justify-between items-center";
+                        div.innerHTML = `
+                            <div class="flex items-center gap-2 truncate">
+                                <i class="fa-solid fa-file text-amber-400"></i>
+                                <span class="text-white font-medium truncate">${filename}</span>
+                            </div>
+                            <button onclick="previewFile('${filename}', '${item.content}', '${item.file_type}')" class="bg-slate-800 hover:bg-slate-700 text-blue-400 px-2.5 py-1 rounded text-[11px] font-bold">Ver</button>
+                        `;
+                        listAttach.appendChild(div);
+                    }
+                });
+            }
+
+            if (!listComments.children.length) listComments.innerHTML = '<div class="text-xs text-slate-600">No hay comentarios aún.</div>';
+            if (!listAttach.children.length) listAttach.innerHTML = '<div class="text-xs text-slate-600">No hay evidencia subida.</div>';
+        }
+
+        async function addDetailItem(e, type) {
+            e.preventDefault();
+            const activityId = Number(document.getElementById('details-activity-id').value);
+
+            if (type === 'comment') {
+                const text = document.getElementById('new-comment-text').value;
+                document.getElementById('new-comment-text').value = '';
+
+                await tursoQuery([{
+                    sql: "INSERT INTO activity_details (activity_id, type, content, author) VALUES (?, 'comment', ?, ?);",
+                    args: [activityId, text, 'Admin']
+                }]);
+            } else if (type === 'attachment') {
+                const fileInput = document.getElementById('new-attachment-file');
+                if (!fileInput.files.length) return;
+
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+
+                reader.onload = async function() {
+                    const base64Data = reader.result;
+                    await tursoQuery([{
+                        sql: "INSERT INTO activity_details (activity_id, type, content, file_name, file_type, author) VALUES (?, 'attachment', ?, ?, ?, ?);",
+                        args: [activityId, base64Data, file.name, file.type, 'Admin']
+                    }]);
+                    fileInput.value = '';
+                    loadActivityDetails(activityId);
+                };
+
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            loadActivityDetails(activityId);
+        }
+
+        function previewFile(filename, dataUrl, mimeType) {
+            document.getElementById('preview-filename').textContent = filename;
+            const container = document.getElementById('preview-container');
+            const downloadBtn = document.getElementById('preview-download-btn');
+            
+            downloadBtn.href = dataUrl;
+            downloadBtn.download = filename;
+
+            container.innerHTML = '';
+            if (mimeType && mimeType.startsWith('image/')) {
+                container.innerHTML = `<img src="${dataUrl}" class="max-h-full max-w-full object-contain rounded-lg">`;
+            } else {
+                container.innerHTML = `<iframe src="${dataUrl}" class="w-full h-full border-0"></iframe>`;
+            }
+
+            document.getElementById('preview-modal').classList.remove('hidden');
+            document.getElementById('preview-modal').classList.add('flex');
+        }
+
+        function switchTab(tab) {
+            const btnAct = document.getElementById('nav-actividades');
+            const btnUsers = document.getElementById('nav-usuarios');
+            const viewAct = document.getElementById('view-activities');
+            const viewUsers = document.getElementById('view-users');
+
+            const activeClass = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 transition flex items-center gap-2';
+            const inactiveClass = 'px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white transition flex items-center gap-2 border border-transparent';
+
+            if (tab === 'activities') {
+                btnAct.className = activeClass;
+                btnUsers.className = inactiveClass;
+                viewAct.classList.remove('hidden');
+                viewUsers.classList.add('hidden');
+            } else {
+                btnAct.className = inactiveClass;
+                btnUsers.className = activeClass;
+                viewAct.classList.add('hidden');
+                viewUsers.classList.remove('hidden');
+            }
+        }
+
+        function switchDetailsTab(tab) {
+            const tabComments = document.getElementById('tab-comments');
+            const tabAttach = document.getElementById('tab-attachments');
+            const btnComments = document.getElementById('tab-btn-comments');
+            const btnAttach = document.getElementById('tab-btn-attachments');
+
+            if (tab === 'comments') {
+                tabComments.classList.remove('hidden');
+                tabAttach.classList.add('hidden');
+                btnComments.className = 'pb-2 border-b-2 border-blue-500 text-blue-400 flex items-center gap-2 font-bold';
+                btnAttach.className = 'pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 font-bold';
+            } else {
+                tabComments.classList.add('hidden');
+                tabAttach.classList.remove('hidden');
+                btnAttach.className = 'pb-2 border-b-2 border-blue-500 text-blue-400 flex items-center gap-2 font-bold';
+                btnComments.className = 'pb-2 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 font-bold';
+            }
+        }
+
+        function toggleRole(role) {
+            currentRole = role;
+            const notice = document.getElementById('admin-notice');
+            if (role === 'user') {
+                notice.classList.remove('hidden');
+            } else {
+                notice.classList.add('hidden');
+            }
+            renderUsersTable();
+        }
+
+        function toggleFullScreenMenu() {
+            const menu = document.getElementById('fullscreen-menu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('flex');
+        }
+
+        function openTaskModal(id = null) {
+            const modal = document.getElementById('task-modal');
+            const form = document.getElementById('task-form');
+            form.reset();
+
+            if (id) {
+                const task = globalTasks.find(t => t.id === id);
+                if (task) {
+                    document.getElementById('modal-title').textContent = 'Editar Actividad';
+                    document.getElementById('task-id').value = task.id;
+                    document.getElementById('task-title').value = task.title || '';
+                    document.getElementById('task-action-taken').value = task.action_taken || '';
+                    document.getElementById('task-station').value = task.station || '';
+                    document.getElementById('task-assigned').value = task.assigned_to || '';
+                    document.getElementById('task-priority').value = task.priority || 'Media';
+                    document.getElementById('task-start').value = task.start_date || '';
+                    document.getElementById('task-end').value = task.end_date || '';
+                    document.getElementById('task-progress').value = task.progress || 0;
+                    document.getElementById('task-status').value = task.status || 'Open';
+                }
+            } else {
+                document.getElementById('modal-title').textContent = 'Nueva Actividad';
+                document.getElementById('task-id').value = '';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeTaskModal() {
+            const modal = document.getElementById('task-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function openUserModal() {
+            const modal = document.getElementById('user-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeUserModal() {
+            const modal = document.getElementById('user-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function openStationsModal() {
+            const modal = document.getElementById('stations-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeStationsModal() {
+            const modal = document.getElementById('stations-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closeDetailsModal() {
+            const modal = document.getElementById('details-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function closePreviewModal() {
+            const modal = document.getElementById('preview-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const userInput = document.getElementById('login-username').value.trim();
+            const passInput = document.getElementById('login-password').value.trim();
+            const errorDiv = document.getElementById('login-error');
+
+            errorDiv.classList.add('hidden');
+            showLoader("Verificando credenciales...");
+
+            try {
+                const res = await tursoQuery([{
+                    sql: "SELECT id, username, password FROM users WHERE LOWER(username) = LOWER(?) LIMIT 1;",
+                    args: [userInput]
+                }]);
+
+                if (res[0] && res[0].rows && res[0].rows.length > 0) {
+                    const cols = res[0].cols.map(c => c.name);
+                    const userRow = {};
+                    res[0].rows[0].forEach((val, i) => userRow[cols[i]] = val.value);
+
+                    if (userRow.password === passInput) {
+                        document.getElementById('login-screen').classList.add('hidden');
+                        
+                        showLoader("Cargando información del sistema...");
+                        await loadAllData();
+                        return;
+                    }
+                }
+
+                errorDiv.textContent = "Usuario o contraseña incorrectos";
+                errorDiv.classList.remove('hidden');
+
+            } catch (err) {
+                console.error("Error al autenticar con Turso:", err);
+                errorDiv.textContent = "Error de conexión con la base de datos";
+                errorDiv.classList.remove('hidden');
+            } finally {
+                hideLoader();
+            }
+        }
+
+        function logout() {
+            globalTasks = [];
+            globalUsers = [];
+            globalStations = [];
+            renderAllViews();
+
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        function openChangePasswordModal() {
+            document.getElementById('pwd-user-label').textContent = `Usuario: Admin (Daniel)`;
+            document.getElementById('password-modal').classList.remove('hidden');
+            document.getElementById('password-modal').classList.add('flex');
+        }
+
+        function closeChangePasswordModal() {
+            document.getElementById('password-modal').classList.add('hidden');
+            document.getElementById('password-modal').classList.remove('flex');
+        }
+
+        async function handlePasswordChange(e) {
+            e.preventDefault();
+            const newPwd = document.getElementById('pwd-new').value;
+            const confirmPwd = document.getElementById('pwd-confirm').value;
+
+            if (newPwd !== confirmPwd) {
+                document.getElementById('pwd-error').textContent = 'Las contraseñas no coinciden';
+                document.getElementById('pwd-error').classList.remove('hidden');
+                return;
+            }
+
+            await tursoQuery([{ sql: "UPDATE users SET password=? WHERE username='Daniel';", args: [newPwd] }]);
+            
+            document.getElementById('pwd-error').classList.add('hidden');
+            document.getElementById('pwd-success').classList.remove('hidden');
+
+            setTimeout(() => {
+                document.getElementById('pwd-success').classList.add('hidden');
+                closeChangePasswordModal();
+            }, 1200);
+        }
+
+        async function exportToExcel() {
+            showLoader("Generando reporte Excel...");
+
+            try {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('EVT 2 VFF GEMBA', {
+                    views: [{ showGridLines: true }]
+                });
+
+                // Configuración de anchos de columna
+                worksheet.columns = [
+                    { key: 'id', width: 6 },                   // #
+                    { key: 'title', width: 45 },                // Problem Identified
+                    { key: 'station', width: 22 },              // Process
+                    { key: 'assigned_to', width: 22 },          // Owner (Name)
+                    { key: 'action_taken', width: 35 },         // Action Taken
+                    { key: 'evidence', width: 30 },             // Evidence
+                    { key: 'start_date', width: 14 },           // Due Date
+                    { key: 'end_date', width: 22 },             // Date of Implementation
+                    { key: 'status', width: 16 }                // Status
+                ];
+
+                // 1. Encabezado de la Empresa (Fila 1 y 2)
+                worksheet.getCell('A1').value = 'RIVIAN | VOLKSWAGEN GROUP';
+                worksheet.getCell('A1').font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FF000000' } };
+
+                worksheet.getCell('A2').value = 'TECHNOLOGIES';
+                worksheet.getCell('A2').font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FF000000' } };
+
+                // 2. Título Central del Reporte (Fila 2 - Columnas F a H)
+                worksheet.mergeCells('F2:H2');
+                const titleCell = worksheet.getCell('F2');
+                titleCell.value = 'EVT 2 VFF GEMBA';
+                titleCell.font = { name: 'Arial', size: 14, bold: true, color: { argb: 'FF000000' } };
+                titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+                // 3. Encabezado de la Tabla (Fila 4)
+                const headers = [
+                    '#', 
+                    'Problem Identified', 
+                    'Process', 
+                    'Owner (Name)', 
+                    'Action Taken', 
+                    'Evidence', 
+                    'Due Date', 
+                    'Date of Implementation', 
+                    'Status'
+                ];
+
+                const headerRow = worksheet.getRow(4);
+                headerRow.height = 28;
+
+                headers.forEach((headerText, index) => {
+                    const cell = headerRow.getCell(index + 1);
+                    cell.value = headerText;
+                    cell.font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FF000000' } };
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FF7BB2AC' } // Verde azulado de la imagen
+                    };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                    cell.border = {
+                        top: { style: 'thin', color: { argb: 'FFB0C4DE' } },
+                        left: { style: 'thin', color: { argb: 'FFB0C4DE' } },
+                        bottom: { style: 'thin', color: { argb: 'FFB0C4DE' } },
+                        right: { style: 'thin', color: { argb: 'FFB0C4DE' } }
+                    };
+                });
+
+                // 4. Obtención de Evidencias desde Turso DB
+                const detailsRes = await tursoQuery([
+                    "SELECT activity_id, content, file_name, type FROM activity_details WHERE type='attachment';"
+                ]);
+
+                const evidenceMap = {};
+                if (detailsRes[0] && detailsRes[0].rows) {
+                    const cols = detailsRes[0].cols.map(c => c.name);
+                    detailsRes[0].rows.forEach(row => {
+                        let obj = {};
+                        row.forEach((val, i) => obj[cols[i]] = val.value);
+                        const actId = Number(obj.activity_id);
+                        if (!evidenceMap[actId]) evidenceMap[actId] = [];
+                        evidenceMap[actId].push(obj);
+                    });
+                }
+
+                // 5. Carga de Datos y Estilizado de Filas
+                const tasks = getFilteredTasks();
+
+                tasks.forEach((task, idx) => {
+                    const rowNumber = idx + 5;
+                    const row = worksheet.getRow(rowNumber);
+                    row.height = 22;
+
+                    // Mapeo de Estatus
+                    let displayStatus = 'Pendiente';
+                    if (task.status === 'Closed' || task.status === 'Completado' || task.progress === 100) {
+                        displayStatus = 'Completado';
+                    } else if (task.status === 'In Progress' || task.status === 'En Proceso') {
+                        displayStatus = 'En Proceso';
+                    }
+
+                    // Mapeo de Evidencia / Adjuntos
+                    const attachments = evidenceMap[task.id] || [];
+                    let evidenceValue = 'Sin adjuntos';
+                    let isHyperlink = false;
+
+                    if (attachments.length > 0) {
+                        evidenceValue = attachments[0].file_name || 'Ver archivo adjunto';
+                        isHyperlink = true;
+                    }
+
+                    // Asignar valores
+                    row.getCell(1).value = idx + 1;
+                    row.getCell(2).value = task.title || '';
+                    row.getCell(3).value = task.station || 'All Stations';
+                    row.getCell(4).value = task.assigned_to || '';
+                    row.getCell(5).value = task.action_taken || '';
+                    
+                    const evCell = row.getCell(6);
+                    if (isHyperlink && attachments[0].content) {
+                        evCell.value = {
+                            text: evidenceValue,
+                            hyperlink: attachments[0].content
+                        };
+                    } else {
+                        evCell.value = evidenceValue;
+                    }
+
+                    row.getCell(7).value = task.start_date || '';
+                    row.getCell(8).value = task.end_date || '';
+                    row.getCell(9).value = displayStatus;
+
+                    // Alineación y estilos de celda por columna
+                    for (let i = 1; i <= 9; i++) {
+                        const cell = row.getCell(i);
+                        cell.font = { name: 'Arial', size: 9.5, color: { argb: 'FF000000' } };
+
+                        // Bordes finos gris claro
+                        cell.border = {
+                            top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                            left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                            bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } },
+                            right: { style: 'thin', color: { argb: 'FFE2E8F0' } }
+                        };
+
+                        // Ajuste de Alineaciones
+                        if (i === 1 || i === 7 || i === 8 || i === 9) {
+                            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                        } else if (i === 3 || i === 4) {
+                            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                        } else {
+                            cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+                        }
+
+                        // Estilos específicos para la columna Evidence
+                        if (i === 6) {
+                            if (isHyperlink) {
+                                cell.font = { name: 'Arial', size: 9, color: { argb: 'FF1D4ED8' }, underline: true };
+                            } else {
+                                cell.font = { name: 'Arial', size: 9, color: { argb: 'FF94A3B8' } };
+                                cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                            }
+                        }
+                    }
+                });
+
+                // 6. Generar archivo Blob e Iniciar Descarga
+                const buffer = await workbook.xlsx.writeBuffer();
+                saveAs(new Blob([buffer]), `EVT_2_VFF_GEMBA_Reporte_${new Date().toISOString().slice(0, 10)}.xlsx`);
+
+            } catch (err) {
+                console.error("Error al exportar a Excel:", err);
+                alert("Ocurrió un error al generar la exportación a Excel.");
+            } finally {
+                hideLoader();
+            }
+        }
+
+        (async function initApp() {
+            try {
+                showLoader("Conectando con la base de datos...");
+                await initializeDatabaseSchema();
+            } catch (error) {
+                console.error("Error en la preparación inicial:", error);
+            } finally {
+                hideLoader();
+            }
+        })();
     </script>
 </body>
 </html>
