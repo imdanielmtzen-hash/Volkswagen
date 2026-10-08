@@ -259,6 +259,9 @@
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-500"></i>
                             <input type="text" id="search-input" onkeyup="filterTasks()" placeholder="Buscar por título..." class="bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500 w-48 sm:w-64">
                         </div>
+                        <select id="filter-process" onchange="filterTasks()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+                            <option value="">Todos los Procesos</option>
+                        </select>
                         <select id="filter-priority" onchange="filterTasks()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
                             <option value="">Todas las Prioridades</option>
                             <option value="Alta">Alta</option>
@@ -275,6 +278,10 @@
                             <option value="">Todos los Responsables</option>
                         </select>
                         
+                        <button onclick="openProcessesModal()" class="bg-teal-600 hover:bg-teal-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-md shadow-teal-600/20">
+                            <i class="fa-solid fa-gears"></i> Gestionar Procesos
+                        </button>
+
                         <button onclick="openStationsModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 shadow-md shadow-indigo-600/20">
                             <i class="fa-solid fa-warehouse"></i> Gestionar Estaciones
                         </button>
@@ -296,10 +303,11 @@
                                 <th class="p-3.5">#</th>
                                 <th class="p-3.5">Problem Identified</th>
                                 <th class="p-3.5">Process</th>
+                                <th class="p-3.5">Station</th>
                                 <th class="p-3.5">Owner (Name)</th>
                                 <th class="p-3.5">Action Taken</th>
                                 <th class="p-3.5">Evidence</th>
-                                <th class="p-3.5">Due Date</th>
+                                <th class="p-3.5">Start Date</th>
                                 <th class="p-3.5">Date of Implementation</th>
                                 <th class="p-3.5">Status</th>
                                 <th class="p-3.5 text-right">Acciones</th>
@@ -356,6 +364,41 @@
         </div>
 
     </main>
+
+    <div id="processes-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 relative flex flex-col max-h-[85vh]">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-4">
+                <h3 class="text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-gears text-teal-400"></i> Administrar Procesos
+                </h3>
+                <button onclick="closeProcessesModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <form onsubmit="saveProcess(event)" class="flex gap-2 mb-4">
+                <input type="text" id="new-process-name" required placeholder="Nombre del nuevo proceso..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500">
+                <button type="submit" class="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Agregar
+                </button>
+            </form>
+
+            <div class="overflow-y-auto flex-1 border border-slate-800 rounded-lg">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                            <th class="p-3">ID</th>
+                            <th class="p-3">Proceso</th>
+                            <th class="p-3 text-right">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="processes-table-body" class="divide-y divide-slate-800/60"></tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-end border-t border-slate-800 pt-3 mt-4">
+                <button type="button" onclick="closeProcessesModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
 
     <div id="stations-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 relative flex flex-col max-h-[85vh]">
@@ -440,9 +483,15 @@
                     <textarea id="task-action-taken" rows="2" placeholder="Describe las acciones realizadas..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></textarea>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Process (Estación)</label>
-                    <select id="task-station" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></select>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Process</label>
+                        <select id="task-process" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Station</label>
+                        <select id="task-station" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500"></select>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -462,7 +511,7 @@
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-1">Due Date</label>
+                        <label class="block text-xs font-semibold text-slate-400 mb-1">Start Date</label>
                         <input type="date" id="task-start" required class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
                     </div>
                     <div>
@@ -588,12 +637,13 @@
         }
 
         const TURSO_URL = "https://volskwagen-ingdanielmtz.aws-us-west-2.turso.io";
-        const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODg1NDk5ODgsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.zjEdDOnrC_HlVh8leJeiLxPLGcQEJIy8UAUspDKVVYpLuVcL1rMZ_pmhSRf2I9lZSjA59rhTlicrlE9xb8lEBg";
+        const TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3OTE0NjY1ODAsImlkIjoiMDE5ZmJmNTMtZWUwMS03NjIzLTkzYjktZTM3YjU2ZGZiMTc3Iiwia2lkIjoiaUpnZlN5MUJMMjQteGltcmRtdUwzUWlZR1hzeTF1WVJDelB0OXdVY1lOOCIsInJpZCI6ImJmNTI4MTYyLTAyNTgtNGZhMS1hY2Q3LTI1MjIyMmRmODYyZSJ9.QE92JaAIznA0CZ-Dsc601Hih4d2DOKtTLySkeh33h_pjdwcqEx5F_5fYeGOiUcrZ1XE5qXEP-CVpet2H8ZB2AQ";
 
         let currentRole = 'admin';
         let globalTasks = [];
         let globalUsers = [];
         let globalStations = [];
+        let globalProcesses = [];
         let statusChartInstance = null;
         let barChartInstance = null;
 
@@ -661,6 +711,10 @@
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT UNIQUE NOT NULL
                     );`,
+                    `CREATE TABLE IF NOT EXISTS processes (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT UNIQUE NOT NULL
+                    );`,
                     `CREATE TABLE IF NOT EXISTS activities (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         title TEXT NOT NULL,
@@ -671,7 +725,8 @@
                         status TEXT DEFAULT 'Open',
                         priority TEXT DEFAULT 'Media',
                         station TEXT,
-                        action_taken TEXT
+                        action_taken TEXT,
+                        process TEXT
                     );`,
                     `CREATE TABLE IF NOT EXISTS activity_details (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -692,10 +747,11 @@
 
         async function loadAllData() {
             try {
-                const [usersRes, stationsRes, activitiesRes] = await Promise.all([
+                const [usersRes, stationsRes, processesRes, activitiesRes] = await Promise.all([
                     tursoQuery(["SELECT id, username, password FROM users ORDER BY username ASC;"]),
                     tursoQuery(["SELECT id, name FROM stations ORDER BY name ASC;"]),
-                    tursoQuery(["SELECT id, title, assigned_to, start_date, end_date, progress, status, priority, station, action_taken FROM activities ORDER BY id DESC;"])
+                    tursoQuery(["SELECT id, name FROM processes ORDER BY name ASC;"]),
+                    tursoQuery(["SELECT id, title, assigned_to, start_date, end_date, progress, status, priority, station, action_taken, process FROM activities ORDER BY id DESC;"])
                 ]);
 
                 // Procesar Usuarios
@@ -735,6 +791,24 @@
                     globalStations = defaultStations.map((st, idx) => ({ id: idx + 1, name: st }));
                 }
 
+                // Procesar Procesos
+                globalProcesses = [];
+                if (processesRes[0] && processesRes[0].rows) {
+                    const cols = processesRes[0].cols.map(c => c.name);
+                    globalProcesses = processesRes[0].rows.map(row => {
+                        let obj = {};
+                        row.forEach((val, i) => obj[cols[i]] = val.value);
+                        return obj;
+                    });
+                }
+
+                if (globalProcesses.length === 0) {
+                    const defaultProcesses = ["SMT", "PTH", "Assembly", "Testing", "Inspection"];
+                    const prc = defaultProcesses.map(p => ({ sql: "INSERT OR IGNORE INTO processes (name) VALUES (?);", args: [p] }));
+                    await tursoQuery(prc);
+                    globalProcesses = defaultProcesses.map((p, idx) => ({ id: idx + 1, name: p }));
+                }
+
                 // Procesar Actividades
                 globalTasks = [];
                 if (activitiesRes[0] && activitiesRes[0].rows) {
@@ -744,13 +818,15 @@
                         row.forEach((val, i) => obj[cols[i]] = val.value);
                         obj.id = Number(obj.id);
                         obj.progress = Number(obj.progress || 0);
-                        obj.action_taken = obj.action_taken || obj.description || '';
+                        obj.action_taken = obj.action_taken || '';
+                        obj.process = obj.process || '';
                         return obj;
                     });
                 }
 
                 populateUserDropdowns();
                 populateStationDropdowns();
+                populateProcessDropdowns();
                 renderAllViews();
             } catch (err) {
                 console.error("Error al cargar datos remotos:", err);
@@ -798,10 +874,37 @@
             taskStation.value = current;
         }
 
+        function populateProcessDropdowns() {
+            const filterProcess = document.getElementById('filter-process');
+            const taskProcess = document.getElementById('task-process');
+
+            const currentFilter = filterProcess.value;
+            const currentTaskProcess = taskProcess.value;
+
+            filterProcess.innerHTML = '<option value="">Todos los Procesos</option>';
+            taskProcess.innerHTML = '<option value="">Seleccionar Proceso...</option>';
+
+            globalProcesses.forEach(p => {
+                const opt1 = document.createElement('option');
+                opt1.value = p.name;
+                opt1.textContent = p.name;
+                filterProcess.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = p.name;
+                opt2.textContent = p.name;
+                taskProcess.appendChild(opt2);
+            });
+
+            filterProcess.value = currentFilter;
+            taskProcess.value = currentTaskProcess;
+        }
+
         function renderAllViews() {
             renderTasksTable();
             renderUsersTable();
             renderStationsTable();
+            renderProcessesTable();
             renderGanttChart();
             renderKPIs();
             renderCharts();
@@ -814,7 +917,7 @@
             const filtered = getFilteredTasks();
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center p-6 text-slate-500 text-xs">No hay actividades registradas o que coincidan con los filtros.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center p-6 text-slate-500 text-xs">No hay actividades registradas o que coincidan con los filtros.</td></tr>`;
                 return;
             }
 
@@ -832,6 +935,7 @@
                 tr.innerHTML = `
                     <td class="p-3.5 text-slate-400 font-mono">${idx + 1}</td>
                     <td class="p-3.5 font-bold text-white">${t.title}</td>
+                    <td class="p-3.5 text-slate-300">${t.process || '-'}</td>
                     <td class="p-3.5 text-slate-300">${t.station || '-'}</td>
                     <td class="p-3.5 text-indigo-300 font-semibold">${t.assigned_to || 'Sin Asignar'}</td>
                     <td class="p-3.5 text-slate-400 truncate max-w-xs">${t.action_taken || '-'}</td>
@@ -854,12 +958,16 @@
 
         function getFilteredTasks() {
             const search = document.getElementById('search-input').value.toLowerCase();
+            const processFilter = document.getElementById('filter-process').value;
             const priority = document.getElementById('filter-priority').value;
             const status = document.getElementById('filter-status').value;
             const user = document.getElementById('filter-user').value;
 
             return globalTasks.filter(t => {
-                const matchSearch = (t.title || '').toLowerCase().includes(search) || (t.action_taken || '').toLowerCase().includes(search);
+                const matchSearch = (t.title || '').toLowerCase().includes(search) || 
+                                    (t.action_taken || '').toLowerCase().includes(search) || 
+                                    (t.process || '').toLowerCase().includes(search);
+                const matchProcess = !processFilter || t.process === processFilter;
                 const matchPriority = !priority || t.priority === priority;
                 
                 const currentSt = t.status || '';
@@ -870,7 +978,7 @@
                     
                 const matchUser = !user || t.assigned_to === user;
 
-                return matchSearch && matchPriority && matchStatus && matchUser;
+                return matchSearch && matchProcess && matchPriority && matchStatus && matchUser;
             });
         }
 
@@ -917,6 +1025,24 @@
                     <td class="p-3 font-semibold text-white">${s.name}</td>
                     <td class="p-3 text-right">
                         <button onclick="deleteStation(${s.id})" class="p-1 bg-slate-800 hover:bg-slate-700 text-rose-400 rounded transition"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderProcessesTable() {
+            const tbody = document.getElementById('processes-table-body');
+            tbody.innerHTML = '';
+
+            globalProcesses.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition border-b border-slate-800/40";
+                tr.innerHTML = `
+                    <td class="p-3 text-slate-400 font-mono">${p.id}</td>
+                    <td class="p-3 font-semibold text-white">${p.name}</td>
+                    <td class="p-3 text-right">
+                        <button onclick="deleteProcess(${p.id})" class="p-1 bg-slate-800 hover:bg-slate-700 text-rose-400 rounded transition"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1113,6 +1239,7 @@
             const id = document.getElementById('task-id').value;
             const title = document.getElementById('task-title').value;
             const action_taken = document.getElementById('task-action-taken').value;
+            const process = document.getElementById('task-process').value;
             const station = document.getElementById('task-station').value;
             const assigned_to = document.getElementById('task-assigned').value;
             const priority = document.getElementById('task-priority').value;
@@ -1128,23 +1255,25 @@
             if (id) {
                 const task = globalTasks.find(t => t.id == id);
                 if (task) {
-                    Object.assign(task, { title, action_taken, station, assigned_to, priority, start_date, end_date, progress, status });
+                    Object.assign(task, { title, action_taken, station, process, assigned_to, priority, start_date, end_date, progress, status });
                 }
+                populateProcessDropdowns();
                 renderAllViews();
 
                 await tursoQuery([{
-                    sql: `UPDATE activities SET title=?, action_taken=?, station=?, assigned_to=?, priority=?, start_date=?, end_date=?, progress=?, status=? WHERE id=?;`,
-                    args: [title, action_taken, station, assigned_to, priority, start_date, end_date, progress, status, Number(id)]
+                    sql: `UPDATE activities SET title=?, action_taken=?, station=?, process=?, assigned_to=?, priority=?, start_date=?, end_date=?, progress=?, status=? WHERE id=?;`,
+                    args: [title, action_taken, station, process, assigned_to, priority, start_date, end_date, progress, status, Number(id)]
                 }]);
             } else {
                 const tempId = Date.now();
-                const newTask = { id: tempId, title, action_taken, station, assigned_to, priority, start_date, end_date, progress, status };
+                const newTask = { id: tempId, title, action_taken, station, process, assigned_to, priority, start_date, end_date, progress, status };
                 globalTasks.unshift(newTask);
+                populateProcessDropdowns();
                 renderAllViews();
 
                 const res = await tursoQuery([{
-                    sql: `INSERT INTO activities (title, action_taken, station, assigned_to, priority, start_date, end_date, progress, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`,
-                    args: [title, action_taken, station, assigned_to, priority, start_date, end_date, progress, status]
+                    sql: `INSERT INTO activities (title, action_taken, station, process, assigned_to, priority, start_date, end_date, progress, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`,
+                    args: [title, action_taken, station, process, assigned_to, priority, start_date, end_date, progress, status]
                 }]);
                 
                 if (res[0] && res[0].last_insert_rowid) {
@@ -1156,6 +1285,7 @@
         async function deleteTask(id) {
             if (!confirm("¿Deseas eliminar esta actividad?")) return;
             globalTasks = globalTasks.filter(t => t.id !== id);
+            populateProcessDropdowns();
             renderAllViews();
             await tursoQuery([{ sql: "DELETE FROM activities WHERE id=?;", args: [id] }]);
         }
@@ -1220,6 +1350,35 @@
             await tursoQuery([{ sql: "DELETE FROM stations WHERE id=?;", args: [id] }]);
         }
 
+        async function saveProcess(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-process-name').value;
+            document.getElementById('new-process-name').value = '';
+
+            const tempProcess = { id: Date.now(), name };
+            globalProcesses.push(tempProcess);
+            populateProcessDropdowns();
+            renderProcessesTable();
+
+            const res = await tursoQuery([{
+                sql: "INSERT INTO processes (name) VALUES (?);",
+                args: [name]
+            }]);
+
+            if (res[0] && res[0].last_insert_rowid) {
+                tempProcess.id = Number(res[0].last_insert_rowid);
+                renderProcessesTable();
+            }
+        }
+
+        async function deleteProcess(id) {
+            if (!confirm("¿Eliminar proceso?")) return;
+            globalProcesses = globalProcesses.filter(p => p.id !== id);
+            populateProcessDropdowns();
+            renderProcessesTable();
+            await tursoQuery([{ sql: "DELETE FROM processes WHERE id=?;", args: [id] }]);
+        }
+
         async function openDetailsModal(activityId) {
             document.getElementById('details-activity-id').value = activityId;
             const task = globalTasks.find(t => t.id === activityId);
@@ -1257,25 +1416,35 @@
                 items.forEach(item => {
                     if (item.type === 'comment') {
                         const div = document.createElement('div');
-                        div.className = "bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs";
+                        div.className = "bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs flex justify-between items-start gap-2";
                         div.innerHTML = `
-                            <div class="flex justify-between font-bold text-slate-400 mb-1">
-                                <span>${item.author || 'Anónimo'}</span>
-                                <span class="text-[10px] text-slate-600">${item.created_at || ''}</span>
+                            <div class="flex-1">
+                                <div class="flex justify-between font-bold text-slate-400 mb-1">
+                                    <span>${item.author || 'Anónimo'}</span>
+                                    <span class="text-[10px] text-slate-600">${item.created_at || ''}</span>
+                                </div>
+                                <p class="text-slate-200">${item.content}</p>
                             </div>
-                            <p class="text-slate-200">${item.content}</p>
+                            <button onclick="deleteDetailItem(${item.id}, ${activityId})" title="Eliminar comentario" class="text-slate-500 hover:text-rose-400 p-1 transition">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         `;
                         listComments.appendChild(div);
                     } else if (item.type === 'attachment') {
                         const filename = item.file_name || 'Archivo';
                         const div = document.createElement('div');
-                        div.className = "bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs flex justify-between items-center";
+                        div.className = "bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs flex justify-between items-center gap-2";
                         div.innerHTML = `
-                            <div class="flex items-center gap-2 truncate">
+                            <div class="flex items-center gap-2 truncate flex-1">
                                 <i class="fa-solid fa-file text-amber-400"></i>
                                 <span class="text-white font-medium truncate">${filename}</span>
                             </div>
-                            <button onclick="previewFile('${filename}', '${item.content}', '${item.file_type}')" class="bg-slate-800 hover:bg-slate-700 text-blue-400 px-2.5 py-1 rounded text-[11px] font-bold">Ver</button>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="previewFile('${filename}', '${item.content}', '${item.file_type}')" class="bg-slate-800 hover:bg-slate-700 text-blue-400 px-2.5 py-1 rounded text-[11px] font-bold">Ver</button>
+                                <button onclick="deleteDetailItem(${item.id}, ${activityId})" title="Eliminar adjunto" class="text-slate-500 hover:text-rose-400 p-1 transition">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
                         `;
                         listAttach.appendChild(div);
                     }
@@ -1284,6 +1453,12 @@
 
             if (!listComments.children.length) listComments.innerHTML = '<div class="text-xs text-slate-600">No hay comentarios aún.</div>';
             if (!listAttach.children.length) listAttach.innerHTML = '<div class="text-xs text-slate-600">No hay evidencia subida.</div>';
+        }
+
+        async function deleteDetailItem(detailId, activityId) {
+            if (!confirm("¿Deseas eliminar este registro de evidencia/comentario?")) return;
+            await tursoQuery([{ sql: "DELETE FROM activity_details WHERE id=?;", args: [detailId] }]);
+            loadActivityDetails(activityId);
         }
 
         async function addDetailItem(e, type) {
@@ -1411,6 +1586,7 @@
                     document.getElementById('task-id').value = task.id;
                     document.getElementById('task-title').value = task.title || '';
                     document.getElementById('task-action-taken').value = task.action_taken || '';
+                    document.getElementById('task-process').value = task.process || '';
                     document.getElementById('task-station').value = task.station || '';
                     document.getElementById('task-assigned').value = task.assigned_to || '';
                     document.getElementById('task-priority').value = task.priority || 'Media';
@@ -1454,6 +1630,18 @@
 
         function closeStationsModal() {
             const modal = document.getElementById('stations-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function openProcessesModal() {
+            const modal = document.getElementById('processes-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeProcessesModal() {
+            const modal = document.getElementById('processes-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
@@ -1515,6 +1703,7 @@
             globalTasks = [];
             globalUsers = [];
             globalStations = [];
+            globalProcesses = [];
             renderAllViews();
 
             document.getElementById('login-username').value = '';
@@ -1566,42 +1755,40 @@
                     views: [{ showGridLines: true }]
                 });
 
-                // Configuración de anchos de columna
                 worksheet.columns = [
-                    { key: 'id', width: 6 },                   // #
-                    { key: 'title', width: 45 },                // Problem Identified
-                    { key: 'station', width: 22 },              // Process
-                    { key: 'assigned_to', width: 22 },          // Owner (Name)
-                    { key: 'action_taken', width: 35 },         // Action Taken
-                    { key: 'evidence', width: 30 },             // Evidence
-                    { key: 'start_date', width: 14 },           // Due Date
-                    { key: 'end_date', width: 22 },             // Date of Implementation
-                    { key: 'status', width: 16 }                // Status
+                    { key: 'id', width: 6 },
+                    { key: 'title', width: 45 },
+                    { key: 'process', width: 22 },
+                    { key: 'station', width: 22 }, 
+                    { key: 'assigned_to', width: 22 },
+                    { key: 'action_taken', width: 35 },
+                    { key: 'evidence', width: 30 },
+                    { key: 'start_date', width: 14 },
+                    { key: 'end_date', width: 22 },
+                    { key: 'status', width: 16 }
                 ];
 
-                // 1. Encabezado de la Empresa (Fila 1 y 2)
                 worksheet.getCell('A1').value = 'RIVIAN | VOLKSWAGEN GROUP';
                 worksheet.getCell('A1').font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FF000000' } };
 
                 worksheet.getCell('A2').value = 'TECHNOLOGIES';
                 worksheet.getCell('A2').font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FF000000' } };
 
-                // 2. Título Central del Reporte (Fila 2 - Columnas F a H)
                 worksheet.mergeCells('F2:H2');
                 const titleCell = worksheet.getCell('F2');
                 titleCell.value = 'EVT 2 VFF GEMBA';
                 titleCell.font = { name: 'Arial', size: 14, bold: true, color: { argb: 'FF000000' } };
                 titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
 
-                // 3. Encabezado de la Tabla (Fila 4)
                 const headers = [
                     '#', 
                     'Problem Identified', 
-                    'Process', 
+                    'Process',
+                    'Station', 
                     'Owner (Name)', 
                     'Action Taken', 
                     'Evidence', 
-                    'Due Date', 
+                    'Start Date', 
                     'Date of Implementation', 
                     'Status'
                 ];
@@ -1616,7 +1803,7 @@
                     cell.fill = {
                         type: 'pattern',
                         pattern: 'solid',
-                        fgColor: { argb: 'FF7BB2AC' } // Verde azulado de la imagen
+                        fgColor: { argb: 'FF7BB2AC' }
                     };
                     cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
                     cell.border = {
@@ -1627,7 +1814,6 @@
                     };
                 });
 
-                // 4. Obtención de Evidencias desde Turso DB
                 const detailsRes = await tursoQuery([
                     "SELECT activity_id, content, file_name, type FROM activity_details WHERE type='attachment';"
                 ]);
@@ -1644,7 +1830,6 @@
                     });
                 }
 
-                // 5. Carga de Datos y Estilizado de Filas
                 const tasks = getFilteredTasks();
 
                 tasks.forEach((task, idx) => {
@@ -1652,7 +1837,6 @@
                     const row = worksheet.getRow(rowNumber);
                     row.height = 22;
 
-                    // Mapeo de Estatus
                     let displayStatus = 'Pendiente';
                     if (task.status === 'Closed' || task.status === 'Completado' || task.progress === 100) {
                         displayStatus = 'Completado';
@@ -1660,7 +1844,6 @@
                         displayStatus = 'En Proceso';
                     }
 
-                    // Mapeo de Evidencia / Adjuntos
                     const attachments = evidenceMap[task.id] || [];
                     let evidenceValue = 'Sin adjuntos';
                     let isHyperlink = false;
@@ -1670,14 +1853,14 @@
                         isHyperlink = true;
                     }
 
-                    // Asignar valores
                     row.getCell(1).value = idx + 1;
                     row.getCell(2).value = task.title || '';
-                    row.getCell(3).value = task.station || 'All Stations';
-                    row.getCell(4).value = task.assigned_to || '';
-                    row.getCell(5).value = task.action_taken || '';
+                    row.getCell(3).value = task.process || '';
+                    row.getCell(4).value = task.station || 'All Stations';
+                    row.getCell(5).value = task.assigned_to || '';
+                    row.getCell(6).value = task.action_taken || '';
                     
-                    const evCell = row.getCell(6);
+                    const evCell = row.getCell(7);
                     if (isHyperlink && attachments[0].content) {
                         evCell.value = {
                             text: evidenceValue,
@@ -1687,16 +1870,14 @@
                         evCell.value = evidenceValue;
                     }
 
-                    row.getCell(7).value = task.start_date || '';
-                    row.getCell(8).value = task.end_date || '';
-                    row.getCell(9).value = displayStatus;
+                    row.getCell(8).value = task.start_date || '';
+                    row.getCell(9).value = task.end_date || '';
+                    row.getCell(10).value = displayStatus;
 
-                    // Alineación y estilos de celda por columna
-                    for (let i = 1; i <= 9; i++) {
+                    for (let i = 1; i <= 10; i++) {
                         const cell = row.getCell(i);
                         cell.font = { name: 'Arial', size: 9.5, color: { argb: 'FF000000' } };
 
-                        // Bordes finos gris claro
                         cell.border = {
                             top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
                             left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
@@ -1704,17 +1885,15 @@
                             right: { style: 'thin', color: { argb: 'FFE2E8F0' } }
                         };
 
-                        // Ajuste de Alineaciones
-                        if (i === 1 || i === 7 || i === 8 || i === 9) {
+                        if (i === 1 || i === 8 || i === 9 || i === 10) {
                             cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                        } else if (i === 3 || i === 4) {
+                        } else if (i === 3 || i === 4 || i === 5) {
                             cell.alignment = { horizontal: 'center', vertical: 'middle' };
                         } else {
                             cell.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
                         }
 
-                        // Estilos específicos para la columna Evidence
-                        if (i === 6) {
+                        if (i === 7) {
                             if (isHyperlink) {
                                 cell.font = { name: 'Arial', size: 9, color: { argb: 'FF1D4ED8' }, underline: true };
                             } else {
@@ -1725,7 +1904,6 @@
                     }
                 });
 
-                // 6. Generar archivo Blob e Iniciar Descarga
                 const buffer = await workbook.xlsx.writeBuffer();
                 saveAs(new Blob([buffer]), `EVT_2_VFF_GEMBA_Reporte_${new Date().toISOString().slice(0, 10)}.xlsx`);
 
